@@ -32,6 +32,14 @@
         <developerConnection>https://github.com/dyc87112/spring-boot-starter-swagger</developerConnection>
     </scm>
 
+    <developers>
+        <developer>
+            <name>翟永超-程序猿DD</name>
+            <email>dyc87112@qq.com</email>
+            <organization>http://didispace.com</organization>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>1.8</version.java>
