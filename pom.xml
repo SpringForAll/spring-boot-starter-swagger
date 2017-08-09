@@ -8,6 +8,30 @@
     <artifactId>spring-boot-starter-swagger</artifactId>
     <version>1.0.0.RELEASE</version>
 
+    <name>spring-boot-starter-swagger</name>
+    <url>https://github.com/dyc87112/spring-boot-starter-swagger</url>
+    <description>starter for swagger2</description>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>http://didispace.com</url>
+        <connection>git@github.com:dyc87112/spring-boot-starter-swagger.git</connection>
+        <developerConnection>https://github.com/dyc87112/spring-boot-starter-swagger</developerConnection>
+    </scm>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>1.8</version.java>
