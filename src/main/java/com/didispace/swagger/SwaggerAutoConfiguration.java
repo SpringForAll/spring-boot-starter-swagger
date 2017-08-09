@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -44,16 +45,17 @@ public class SwaggerAutoConfiguration {
                 .termsOfServiceUrl(swaggerProperties.getTermsOfServiceUrl())
                 .build();
 
+        // base-path处理
         // 当没有配置任何path的时候，解析/**
         if(swaggerProperties.getBasePath().isEmpty()) {
             swaggerProperties.getBasePath().add("/**");
         }
-
         List<Predicate<String>> basePath = new ArrayList();
         for(String path : swaggerProperties.getBasePath()) {
             basePath.add(PathSelectors.ant(path));
         }
 
+        // exclude-path处理
         List<Predicate<String>> excludePath = new ArrayList();
         for(String path : swaggerProperties.getExcludePath()) {
             excludePath.add(PathSelectors.ant(path));
@@ -62,6 +64,7 @@ public class SwaggerAutoConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo)
                 .select()
+                .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                 .paths(
                         Predicates.and(
                                 Predicates.not(Predicates.or(excludePath)),

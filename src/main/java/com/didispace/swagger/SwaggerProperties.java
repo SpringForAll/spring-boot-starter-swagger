@@ -31,6 +31,9 @@ public class SwaggerProperties {
 
     private Contact contact = new Contact();
 
+    /**swagger会解析的包路径**/
+    private String basePackage = "";
+
     /**swagger会解析的url规则**/
     private List<String> basePath = new ArrayList<>();
     /**在basePath基础上需要排除的url规则**/
