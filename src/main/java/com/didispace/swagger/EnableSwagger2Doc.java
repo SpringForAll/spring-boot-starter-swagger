@@ -7,8 +7,8 @@ import java.lang.annotation.*;
 
 /**
  * @author 翟永超
- * @create 2017/8/7.
- * @blog http://blog.didispace.com
+ * Create date ：2017/8/7.
+ * My blog： http://blog.didispace.com
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

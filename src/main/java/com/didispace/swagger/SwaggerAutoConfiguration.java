@@ -17,8 +17,8 @@ import java.util.List;
 
 /**
  * @author 翟永超
- * @create 2017/8/7.
- * @blog http://blog.didispace.com
+ * Create date ：2017/8/7.
+ * My blog： http://blog.didispace.com
  */
 @Configuration
 public class SwaggerAutoConfiguration {
@@ -45,9 +45,9 @@ public class SwaggerAutoConfiguration {
                 .build();
 
         // 当没有配置任何path的时候，解析/**
-        if(swaggerProperties.getBasePath().isEmpty()) {
-            swaggerProperties.getBasePath().add("/**");
-        }
+//        if(swaggerProperties.getBasePath().isEmpty()) {
+//            swaggerProperties.getBasePath().add("/**");
+//        }
 
         List<Predicate<String>> basePath = new ArrayList();
         for(String path : swaggerProperties.getBasePath()) {
