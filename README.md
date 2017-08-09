@@ -1,6 +1,13 @@
-# spring-boot-starter-swagger
+# 简介
 
 该项目主要利用Spring Boot的自动化配置特性来实现快速的将swagger2引入spring boot应用来生成API文档，简化原生使用swagger2的整合代码。
+
+GitHub：https://github.com/dyc87112/spring-boot-starter-swagger
+码云：http://git.oschina.net/didispace/spring-boot-starter-swagger
+博客：http://blog.didispace.com
+
+**小工具一枚，欢迎使用和Star支持，如使用过程中碰到问题，可以提出Issue，我会尽力完善该Starter**
+
 
 # 版本基础
 
