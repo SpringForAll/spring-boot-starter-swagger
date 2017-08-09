@@ -45,9 +45,9 @@ public class SwaggerAutoConfiguration {
                 .build();
 
         // 当没有配置任何path的时候，解析/**
-//        if(swaggerProperties.getBasePath().isEmpty()) {
-//            swaggerProperties.getBasePath().add("/**");
-//        }
+        if(swaggerProperties.getBasePath().isEmpty()) {
+            swaggerProperties.getBasePath().add("/**");
+        }
 
         List<Predicate<String>> basePath = new ArrayList();
         for(String path : swaggerProperties.getBasePath()) {
