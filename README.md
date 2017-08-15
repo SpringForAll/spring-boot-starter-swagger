@@ -68,6 +68,7 @@ swagger.exclude-path=/error, /ops/**
 
 ### 默认配置
 
+```
 - swagger.title=标题
 - swagger.description=描述
 - swagger.version=版本
@@ -80,6 +81,7 @@ swagger.exclude-path=/error, /ops/**
 - swagger.base-package=swagger扫描的基础包，默认：全扫描
 - swagger.base-path=需要处理的基础URL规则，默认：/**
 - swagger.exclude-path=需要排除的URL规则，默认：空
+```
 
 ### Path规则说明
 
@@ -108,6 +110,7 @@ swagger.exclude-path=/ops/**, /error
 
 具体配置内容如下：
 
+```
 - swagger.docket.<name>.title=标题
 - swagger.docket.<name>.description=描述
 - swagger.docket.<name>.version=版本
@@ -120,6 +123,7 @@ swagger.exclude-path=/ops/**, /error
 - swagger.docket.<name>.base-package=swagger扫描的基础包，默认：全扫描
 - swagger.docket.<name>.base-path=需要处理的基础URL规则，默认：/**
 - swagger.docket.<name>.exclude-path=需要排除的URL规则，默认：空
+```
 
 说明：`<name>`为swagger文档的分组名称，同一个项目中可以配置多个分组，用来划分不同的API文档。
 
