@@ -2,9 +2,12 @@
 
 该项目主要利用Spring Boot的自动化配置特性来实现快速的将swagger2引入spring boot应用来生成API文档，简化原生使用swagger2的整合代码。
 
-- GitHub：https://github.com/dyc87112/spring-boot-starter-swagger
-- 码云：http://git.oschina.net/didispace/spring-boot-starter-swagger
-- 博客：http://blog.didispace.com
+- 源码地址
+  - GitHub：https://github.com/dyc87112/spring-boot-starter-swagger
+  - 码云：https://gitee.com/didispace/spring-boot-starter-swagger
+- 使用样例：https://github.com/dyc87112/swagger-starter-demo
+- 我的博客：http://blog.didispace.com
+- 我们社区：http://spring4all.com
 
 **小工具一枚，欢迎使用和Star支持，如使用过程中碰到问题，可以提出Issue，我会尽力完善该Starter**
 
@@ -23,7 +26,7 @@
 <dependency>
 	<groupId>com.didispace</groupId>
 	<artifactId>spring-boot-starter-swagger</artifactId>
-	<version>1.2.0.RELEASE</version>
+	<version>1.3.0.RELEASE</version>
 </dependency>
 ```
 
@@ -52,7 +55,7 @@ public class Bootstrap {
 ```properties
 swagger.title=spring-boot-starter-swagger
 swagger.description=Starter for swagger 2.x
-swagger.version=1.1.0.RELEASE
+swagger.version=1.3.0.RELEASE
 swagger.license=Apache License, Version 2.0
 swagger.licenseUrl=https://www.apache.org/licenses/LICENSE-2.0.html
 swagger.termsOfServiceUrl=https://github.com/dyc87112/spring-boot-starter-swagger
@@ -140,3 +143,7 @@ swagger.docket.bbb.basePackage=com.yonghui
 ```
 
 说明：默认配置与分组配置可以一起使用。在分组配置中没有配置的内容将使用默认配置替代，所以默认配置可以作为分组配置公共部分属性的配置。
+
+### JSR-303校验注解支持
+
+TODO 待完善内容 
