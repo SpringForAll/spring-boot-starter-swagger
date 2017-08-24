@@ -73,6 +73,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             }
 
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
+                    .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
@@ -126,6 +127,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             }
 
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
+                    .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
                     .groupName(groupName)
                     .select()

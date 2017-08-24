@@ -44,6 +44,9 @@ public class SwaggerProperties {
     /**分组文档**/
     private Map<String, DocketInfo> docket = new LinkedHashMap<>();
 
+    /**host信息**/
+    private String host = "";
+
     @Data
     @NoArgsConstructor
     public static class DocketInfo {
