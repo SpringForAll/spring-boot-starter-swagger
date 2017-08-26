@@ -71,6 +71,7 @@ swagger.exclude-path=/error, /ops/**
 
 ### 默认配置
 
+```
 - swagger.title=标题
 - swagger.description=描述
 - swagger.version=版本
@@ -83,6 +84,10 @@ swagger.exclude-path=/error, /ops/**
 - swagger.base-package=swagger扫描的基础包，默认：全扫描
 - swagger.base-path=需要处理的基础URL规则，默认：/**
 - swagger.exclude-path=需要排除的URL规则，默认：空
+- swagger.host=文档的host信息，默认：空
+```
+
+**host属性从1.3.0.RELEASE开始支持**
 
 ### Path规则说明
 
@@ -111,6 +116,7 @@ swagger.exclude-path=/ops/**, /error
 
 具体配置内容如下：
 
+```
 - swagger.docket.<name>.title=标题
 - swagger.docket.<name>.description=描述
 - swagger.docket.<name>.version=版本
@@ -123,6 +129,7 @@ swagger.exclude-path=/ops/**, /error
 - swagger.docket.<name>.base-package=swagger扫描的基础包，默认：全扫描
 - swagger.docket.<name>.base-path=需要处理的基础URL规则，默认：/**
 - swagger.docket.<name>.exclude-path=需要排除的URL规则，默认：空
+```
 
 说明：`<name>`为swagger文档的分组名称，同一个项目中可以配置多个分组，用来划分不同的API文档。
 
@@ -131,7 +138,7 @@ swagger.exclude-path=/ops/**, /error
 ```properties
 swagger.docket.aaa.title=group-a
 swagger.docket.aaa.description=Starter for swagger 2.x
-swagger.docket.aaa.version=1.2.0.RELEASE
+swagger.docket.aaa.version=1.3.0.RELEASE
 swagger.docket.aaa.termsOfServiceUrl=https://gitee.com/didispace/spring-boot-starter-swagger
 swagger.docket.aaa.contact.name=zhaiyongchao
 swagger.docket.aaa.contact.url=http://spring4all.com/
@@ -146,4 +153,18 @@ swagger.docket.bbb.basePackage=com.yonghui
 
 ### JSR-303校验注解支持
 
-TODO 待完善内容 
+支持对JSR-303校验注解的展示，如下图所示：
+
+![JSR-303校验展示](https://github.com/dyc87112/spring-boot-starter-swagger/blob/master/images/jsr-303.png)
+
+目前共支持以下几个注解：
+
+- `@NotNull`
+- `@Max、@Min`
+- `@Size`
+- `@Pattern`
+
+## 贡献者
+
+- [程序猿DD-翟永超](https://github.com/dyc87112/)
+- [小火](https://renlulu.github.io/)
