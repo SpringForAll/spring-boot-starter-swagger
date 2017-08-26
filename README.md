@@ -87,7 +87,7 @@ swagger.exclude-path=/error, /ops/**
 - swagger.host=文档的host信息，默认：空
 ```
 
-**host属性从1.3.0.RELEASE开始支持**
+> host属性从1.3.0.RELEASE开始支持
 
 ### Path规则说明
 
