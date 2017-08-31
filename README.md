@@ -65,6 +65,10 @@ swagger.contact.email=dyc87112@qq.com
 swagger.base-package=com.didispace
 swagger.base-path=/**
 swagger.exclude-path=/error, /ops/**
+swagger.name=name
+swagger.modelRef=string
+swagger.parameterType=header
+swagger.required=true
 ```
 
 ## 配置说明
@@ -85,6 +89,10 @@ swagger.exclude-path=/error, /ops/**
 - swagger.base-path=需要处理的基础URL规则，默认：/**
 - swagger.exclude-path=需要排除的URL规则，默认：空
 - swagger.host=文档的host信息，默认：空
+- swagger.name=参数名
+- swagger.modelRef=指定参数类型
+- swagger.parameterType=指定参数存放位置,可选header,query,path,body.form
+- swagger.required=true=指定参数是否必传，true,false
 ```
 
 > host属性从1.3.0.RELEASE开始支持
@@ -129,6 +137,10 @@ swagger.exclude-path=/ops/**, /error
 - swagger.docket.<name>.base-package=swagger扫描的基础包，默认：全扫描
 - swagger.docket.<name>.base-path=需要处理的基础URL规则，默认：/**
 - swagger.docket.<name>.exclude-path=需要排除的URL规则，默认：空
+- swagger.docket.<name>.name=参数名
+- swagger.docket.<name>.modelRef=指定参数类型
+- swagger.docket.<name>.parameterType=指定参数存放位置,可选header,query,path,body.form
+- swagger.docket.<name>.required=true=指定参数是否必传，true,false
 ```
 
 说明：`<name>`为swagger文档的分组名称，同一个项目中可以配置多个分组，用来划分不同的API文档。

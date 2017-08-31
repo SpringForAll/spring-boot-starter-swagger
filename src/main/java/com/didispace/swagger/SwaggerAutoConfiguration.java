@@ -10,16 +10,21 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
+import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * @author 翟永超
@@ -43,7 +48,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
         ConfigurableBeanFactory configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
 
         // 没有分组
-        if(swaggerProperties.getDocket().size() == 0) {
+        if (swaggerProperties.getDocket().size() == 0) {
             ApiInfo apiInfo = new ApiInfoBuilder()
                     .title(swaggerProperties.getTitle())
                     .description(swaggerProperties.getDescription())
@@ -58,23 +63,31 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
             // base-path处理
             // 当没有配置任何path的时候，解析/**
-            if(swaggerProperties.getBasePath().isEmpty()) {
+            if (swaggerProperties.getBasePath().isEmpty()) {
                 swaggerProperties.getBasePath().add("/**");
             }
             List<Predicate<String>> basePath = new ArrayList();
-            for(String path : swaggerProperties.getBasePath()) {
+            for (String path : swaggerProperties.getBasePath()) {
                 basePath.add(PathSelectors.ant(path));
             }
 
             // exclude-path处理
             List<Predicate<String>> excludePath = new ArrayList();
-            for(String path : swaggerProperties.getExcludePath()) {
+            for (String path : swaggerProperties.getExcludePath()) {
                 excludePath.add(PathSelectors.ant(path));
             }
+
 
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
+                    .globalOperationParameters(newArrayList(new ParameterBuilder()
+                            .name(swaggerProperties.getName())
+                            .description(swaggerProperties.getDescription())
+                            .modelRef(new ModelRef(swaggerProperties.getModelRef()))
+                            .parameterType(swaggerProperties.getParameterType())
+                            .required(Boolean.parseBoolean(swaggerProperties.getRequired()))
+                            .build()))
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                     .paths(
@@ -91,7 +104,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
         // 分组创建
         List<Docket> docketList = new LinkedList<>();
-        for(String groupName : swaggerProperties.getDocket().keySet()) {
+        for (String groupName : swaggerProperties.getDocket().keySet()) {
             SwaggerProperties.DocketInfo docketInfo = swaggerProperties.getDocket().get(groupName);
 
             ApiInfo apiInfo = new ApiInfoBuilder()
@@ -102,9 +115,9 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     .licenseUrl(docketInfo.getLicenseUrl().isEmpty() ? swaggerProperties.getLicenseUrl() : docketInfo.getLicenseUrl())
                     .contact(
                             new Contact(
-                                docketInfo.getContact().getName().isEmpty() ? swaggerProperties.getContact().getName() : docketInfo.getContact().getName(),
-                                docketInfo.getContact().getUrl().isEmpty() ? swaggerProperties.getContact().getUrl() : docketInfo.getContact().getUrl(),
-                             docketInfo.getContact().getEmail().isEmpty() ? swaggerProperties.getContact().getEmail() : docketInfo.getContact().getEmail()
+                                    docketInfo.getContact().getName().isEmpty() ? swaggerProperties.getContact().getName() : docketInfo.getContact().getName(),
+                                    docketInfo.getContact().getUrl().isEmpty() ? swaggerProperties.getContact().getUrl() : docketInfo.getContact().getUrl(),
+                                    docketInfo.getContact().getEmail().isEmpty() ? swaggerProperties.getContact().getEmail() : docketInfo.getContact().getEmail()
                             )
                     )
                     .termsOfServiceUrl(docketInfo.getTermsOfServiceUrl().isEmpty() ? swaggerProperties.getTermsOfServiceUrl() : docketInfo.getTermsOfServiceUrl())
@@ -112,23 +125,30 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
             // base-path处理
             // 当没有配置任何path的时候，解析/**
-            if(docketInfo.getBasePath().isEmpty()) {
+            if (docketInfo.getBasePath().isEmpty()) {
                 docketInfo.getBasePath().add("/**");
             }
             List<Predicate<String>> basePath = new ArrayList();
-            for(String path : docketInfo.getBasePath()) {
+            for (String path : docketInfo.getBasePath()) {
                 basePath.add(PathSelectors.ant(path));
             }
 
             // exclude-path处理
             List<Predicate<String>> excludePath = new ArrayList();
-            for(String path : docketInfo.getExcludePath()) {
+            for (String path : docketInfo.getExcludePath()) {
                 excludePath.add(PathSelectors.ant(path));
             }
 
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
+                    .globalOperationParameters(newArrayList(new ParameterBuilder()
+                            .name(swaggerProperties.getName())
+                            .description(swaggerProperties.getDescription())
+                            .modelRef(new ModelRef(swaggerProperties.getModelRef()))
+                            .parameterType(swaggerProperties.getParameterType())
+                            .required(Boolean.parseBoolean(swaggerProperties.getRequired()))
+                            .build()))
                     .groupName(groupName)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))

@@ -3,6 +3,7 @@ package com.didispace.swagger;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import springfox.documentation.schema.ModelRef;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,6 +31,18 @@ public class SwaggerProperties {
     private String licenseUrl = "";
     /**服务条款URL**/
     private String termsOfServiceUrl = "";
+
+    /**参数名**/
+    private String name;
+
+    /**指定参数类型**/
+    private String modelRef;
+
+    /**参数放在哪个地方:header,query,path,body.form**/
+    private String parameterType;
+
+    /**参数是否必须传**/
+    private String required;
 
     private Contact contact = new Contact();
 
