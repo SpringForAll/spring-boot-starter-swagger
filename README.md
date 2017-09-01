@@ -65,10 +65,16 @@ swagger.contact.email=dyc87112@qq.com
 swagger.base-package=com.didispace
 swagger.base-path=/**
 swagger.exclude-path=/error, /ops/**
-swagger.name=name
-swagger.modelRef=string
-swagger.parameterType=header
-swagger.required=true
+swagger.globalOperationParameters[0].name=name one
+swagger.globalOperationParameters[0].description=some description one
+swagger.globalOperationParameters[0].modelRef=string
+swagger.globalOperationParameters[0].parameterType=header
+swagger.globalOperationParameters[0].required=true
+swagger.globalOperationParameters[1].name=name two
+swagger.globalOperationParameters[1].description=some description two
+swagger.globalOperationParameters[1].modelRef=string
+swagger.globalOperationParameters[1].parameterType=body
+swagger.globalOperationParameters[1].required=false
 ```
 
 ## 配置说明
@@ -89,10 +95,11 @@ swagger.required=true
 - swagger.base-path=需要处理的基础URL规则，默认：/**
 - swagger.exclude-path=需要排除的URL规则，默认：空
 - swagger.host=文档的host信息，默认：空
-- swagger.name=参数名
-- swagger.modelRef=指定参数类型
-- swagger.parameterType=指定参数存放位置,可选header,query,path,body.form
-- swagger.required=true=指定参数是否必传，true,false
+- swagger.globalOperationParameters[0].name=参数名
+- swagger.globalOperationParameters[0].description=描述信息
+- swagger.globalOperationParameters[0].modelRef=指定参数类型
+- swagger.globalOperationParameters[0].parameterType=指定参数存放位置,可选header,query,path,body.form
+- swagger.globalOperationParameters[0].required=指定参数是否必传，true,false
 ```
 
 > host属性从1.3.0.RELEASE开始支持
