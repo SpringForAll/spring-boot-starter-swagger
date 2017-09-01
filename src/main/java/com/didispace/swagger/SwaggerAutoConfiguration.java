@@ -2,6 +2,7 @@ package com.didispace.swagger;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.collect.Lists;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -81,13 +82,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .globalOperationParameters(newArrayList(new ParameterBuilder()
-                            .name(swaggerProperties.getName())
-                            .description(swaggerProperties.getDescription())
-                            .modelRef(new ModelRef(swaggerProperties.getModelRef()))
-                            .parameterType(swaggerProperties.getParameterType())
-                            .required(Boolean.parseBoolean(swaggerProperties.getRequired()))
-                            .build()))
+                    .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(swaggerProperties))
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                     .paths(
@@ -142,13 +137,13 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .globalOperationParameters(newArrayList(new ParameterBuilder()
-                            .name(swaggerProperties.getName())
-                            .description(swaggerProperties.getDescription())
-                            .modelRef(new ModelRef(swaggerProperties.getModelRef()))
-                            .parameterType(swaggerProperties.getParameterType())
-                            .required(Boolean.parseBoolean(swaggerProperties.getRequired()))
-                            .build()))
+//                    .globalOperationParameters(newArrayList(new ParameterBuilder()
+//                            .name(swaggerProperties.getName())
+//                            .description(swaggerProperties.getDescription())
+//                            .modelRef(new ModelRef(swaggerProperties.getModelRef()))
+//                            .parameterType(swaggerProperties.getParameterType())
+//                            .required(Boolean.parseBoolean(swaggerProperties.getRequired()))
+//                            .build()))
                     .groupName(groupName)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
@@ -169,5 +164,19 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
+    }
+
+    private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(SwaggerProperties swaggerProperties) {
+        List<Parameter> parameters = Lists.newArrayList();
+        for (int i = 0; i < swaggerProperties.getGlobalOperationParameters().size(); i++) {
+            parameters.add(new ParameterBuilder()
+                    .name(swaggerProperties.getGlobalOperationParameters().get(i).getName())
+                    .description(swaggerProperties.getGlobalOperationParameters().get(i).getDescription())
+                    .modelRef(new ModelRef(swaggerProperties.getGlobalOperationParameters().get(i).getModelRef()))
+                    .parameterType(swaggerProperties.getGlobalOperationParameters().get(i).getParameterType())
+                    .required(Boolean.parseBoolean(swaggerProperties.getGlobalOperationParameters().get(i).getRequired()))
+                    .build());
+        }
+        return parameters;
     }
 }

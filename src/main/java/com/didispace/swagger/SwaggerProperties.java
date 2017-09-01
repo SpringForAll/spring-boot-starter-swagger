@@ -32,18 +32,6 @@ public class SwaggerProperties {
     /**服务条款URL**/
     private String termsOfServiceUrl = "";
 
-    /**参数名**/
-    private String name;
-
-    /**指定参数类型**/
-    private String modelRef;
-
-    /**参数放在哪个地方:header,query,path,body.form**/
-    private String parameterType;
-
-    /**参数是否必须传**/
-    private String required;
-
     private Contact contact = new Contact();
 
     /**swagger会解析的包路径**/
@@ -59,6 +47,30 @@ public class SwaggerProperties {
 
     /**host信息**/
     private String host = "";
+
+    /**全局参数配置**/
+    private List<GlobalOperationParameter> globalOperationParameters;
+
+
+    @Data
+    @NoArgsConstructor
+    @ConfigurationProperties("swagger.globalOperationParameters")
+    public static class GlobalOperationParameter{
+        /**参数名**/
+        private String name;
+
+        /**描述信息**/
+        private String description;
+
+        /**指定参数类型**/
+        private String modelRef;
+
+        /**参数放在哪个地方:header,query,path,body.form**/
+        private String parameterType;
+
+        /**参数是否必须传**/
+        private String required;
+    }
 
     @Data
     @NoArgsConstructor
