@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 /**
  * @author 翟永超
  * Create date ：2017/8/7.
@@ -137,13 +135,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-//                    .globalOperationParameters(newArrayList(new ParameterBuilder()
-//                            .name(swaggerProperties.getName())
-//                            .description(swaggerProperties.getDescription())
-//                            .modelRef(new ModelRef(swaggerProperties.getModelRef()))
-//                            .parameterType(swaggerProperties.getParameterType())
-//                            .required(Boolean.parseBoolean(swaggerProperties.getRequired()))
-//                            .build()))
+                    .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(swaggerProperties))
                     .groupName(groupName)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
