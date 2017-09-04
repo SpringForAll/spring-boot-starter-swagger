@@ -54,7 +54,6 @@ public class SwaggerProperties {
 
     @Data
     @NoArgsConstructor
-    @ConfigurationProperties("swagger.globalOperationParameters")
     public static class GlobalOperationParameter{
         /**参数名**/
         private String name;
@@ -70,6 +69,7 @@ public class SwaggerProperties {
 
         /**参数是否必须传**/
         private String required;
+
     }
 
     @Data
@@ -98,6 +98,8 @@ public class SwaggerProperties {
         private List<String> basePath = new ArrayList<>();
         /**在basePath基础上需要排除的url规则**/
         private List<String> excludePath = new ArrayList<>();
+
+        private List<GlobalOperationParameter> globalOperationParameters;
 
     }
 

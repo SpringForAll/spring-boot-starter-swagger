@@ -102,6 +102,7 @@ swagger.globalOperationParameters[1].required=false
 - swagger.globalOperationParameters[0].required=指定参数是否必传，true,false
 ```
 
+
 > host属性从1.3.0.RELEASE开始支持
 
 ### Path规则说明
@@ -148,9 +149,14 @@ swagger.exclude-path=/ops/**, /error
 - swagger.docket.<name>.modelRef=指定参数类型
 - swagger.docket.<name>.parameterType=指定参数存放位置,可选header,query,path,body.form
 - swagger.docket.<name>.required=true=指定参数是否必传，true,false
+- swagger.docket.<name>.globalOperationParameters[0].name=参数名
+- swagger.docket.<name>.globalOperationParameters[0].description=描述信息
+- swagger.docket.<name>.globalOperationParameters[0].modelRef=指定参数存放位置,可选header,query,path,body.form
+- swagger.docket.<name>.globalOperationParameters[0].parameterType=指定参数是否必传，true,false
 ```
 
 说明：`<name>`为swagger文档的分组名称，同一个项目中可以配置多个分组，用来划分不同的API文档。
+
 
 **分组配置示例**
 
@@ -163,12 +169,20 @@ swagger.docket.aaa.contact.name=zhaiyongchao
 swagger.docket.aaa.contact.url=http://spring4all.com/
 swagger.docket.aaa.contact.email=didi@potatomato.club
 swagger.docket.aaa.excludePath=/ops/**
+swagger.docket.aaa.globalOperationParameters[0].name=name three
+swagger.docket.aaa.globalOperationParameters[0].description=some description three override
+swagger.docket.aaa.globalOperationParameters[0].modelRef=string
+swagger.docket.aaa.globalOperationParameters[0].parameterType=header
 
 swagger.docket.bbb.title=group-bbb
 swagger.docket.bbb.basePackage=com.yonghui
+
+
 ```
 
 说明：默认配置与分组配置可以一起使用。在分组配置中没有配置的内容将使用默认配置替代，所以默认配置可以作为分组配置公共部分属性的配置。
+
+`swagger.docket.aaa.globalOperationParameters[0].name` 会覆盖同名的全局配置
 
 ### JSR-303校验注解支持
 
