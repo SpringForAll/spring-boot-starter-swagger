@@ -8,8 +8,8 @@ import springfox.documentation.swagger2.configuration.Swagger2DocumentationConfi
 
 /**
  * @author 翟永超
- * @create 2017/9/7.
- * @blog http://blog.didispace.com
+ * Create Date： 2017/9/7.
+ * My blog： http://blog.didispace.com
  */
 @Configuration
 @ConditionalOnProperty(name = "swagger.enabled", matchIfMissing = true)

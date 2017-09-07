@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author 翟永超
- * Create date ：2017/8/7.
+ * Create date：2017/8/7.
  * My blog： http://blog.didispace.com
  */
 @Configuration
