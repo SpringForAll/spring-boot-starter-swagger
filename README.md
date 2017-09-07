@@ -26,7 +26,7 @@
 <dependency>
 	<groupId>com.didispace</groupId>
 	<artifactId>spring-boot-starter-swagger</artifactId>
-	<version>1.3.0.RELEASE</version>
+	<version>1.4.0.RELEASE</version>
 </dependency>
 ```
 
@@ -53,9 +53,11 @@ public class Bootstrap {
 ## 配置示例
 
 ```properties
+swagger.enabled=true
+
 swagger.title=spring-boot-starter-swagger
 swagger.description=Starter for swagger 2.x
-swagger.version=1.3.0.RELEASE
+swagger.version=1.4.0.RELEASE
 swagger.license=Apache License, Version 2.0
 swagger.licenseUrl=https://www.apache.org/licenses/LICENSE-2.0.html
 swagger.termsOfServiceUrl=https://github.com/dyc87112/spring-boot-starter-swagger
@@ -65,6 +67,7 @@ swagger.contact.email=dyc87112@qq.com
 swagger.base-package=com.didispace
 swagger.base-path=/**
 swagger.exclude-path=/error, /ops/**
+
 swagger.globalOperationParameters[0].name=name one
 swagger.globalOperationParameters[0].description=some description one
 swagger.globalOperationParameters[0].modelRef=string
@@ -82,6 +85,7 @@ swagger.globalOperationParameters[1].required=false
 ### 默认配置
 
 ```
+- swagger.enabled=是否启用swagger，默认：true
 - swagger.title=标题
 - swagger.description=描述
 - swagger.version=版本
@@ -103,7 +107,11 @@ swagger.globalOperationParameters[1].required=false
 ```
 
 
-> host属性从1.3.0.RELEASE开始支持
+> `1.3.0.RELEASE`新增：`swagger.host`属性，同时也支持指定docket的配置
+>
+> `1.4.0.RELEASE`新增：
+> - `swagger.enabled`：用于开关swagger的配置
+> - `swagger.globalOperationParameters`：用于设置全局的参数，比如：header部分的accessToken等。该参数支持指定docket的配置。
 
 ### Path规则说明
 
@@ -176,13 +184,9 @@ swagger.docket.aaa.globalOperationParameters[0].parameterType=header
 
 swagger.docket.bbb.title=group-bbb
 swagger.docket.bbb.basePackage=com.yonghui
-
-
 ```
 
-说明：默认配置与分组配置可以一起使用。在分组配置中没有配置的内容将使用默认配置替代，所以默认配置可以作为分组配置公共部分属性的配置。
-
-`swagger.docket.aaa.globalOperationParameters[0].name` 会覆盖同名的全局配置
+说明：默认配置与分组配置可以一起使用。在分组配置中没有配置的内容将使用默认配置替代，所以默认配置可以作为分组配置公共部分属性的配置。`swagger.docket.aaa.globalOperationParameters[0].name`会覆盖同名的全局配置。
 
 ### JSR-303校验注解支持
 
