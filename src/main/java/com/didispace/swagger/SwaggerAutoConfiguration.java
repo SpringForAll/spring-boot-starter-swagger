@@ -8,8 +8,10 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -33,6 +35,9 @@ import java.util.stream.Collectors;
  * My blog： http://blog.didispace.com
  */
 @Configuration
+@Import({
+        Swagger2Configuration.class
+})
 public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
     private BeanFactory beanFactory;
@@ -45,6 +50,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "swagger.enabled", matchIfMissing = true)
     public List<Docket> createRestApi(SwaggerProperties swaggerProperties) {
         ConfigurableBeanFactory configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
 

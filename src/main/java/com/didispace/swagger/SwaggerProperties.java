@@ -19,6 +19,9 @@ import java.util.Map;
 @ConfigurationProperties("swagger")
 public class SwaggerProperties {
 
+    /**是否开启swagger**/
+    private Boolean enabled;
+
     /**标题**/
     private String title = "";
     /**描述**/
