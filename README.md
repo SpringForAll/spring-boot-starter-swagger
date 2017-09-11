@@ -28,7 +28,7 @@
 <dependency>
 	<groupId>com.didispace</groupId>
 	<artifactId>spring-boot-starter-swagger</artifactId>
-	<version>1.4.0.RELEASE</version>
+	<version>1.4.1.RELEASE</version>
 </dependency>
 ```
 
