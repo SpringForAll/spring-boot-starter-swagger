@@ -23,10 +23,7 @@ import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -171,6 +168,10 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(
             List<SwaggerProperties.GlobalOperationParameter> globalOperationParameters) {
         List<Parameter> parameters = Lists.newArrayList();
+
+        if (Objects.isNull(globalOperationParameters)) {
+            return parameters;
+        }
         for (SwaggerProperties.GlobalOperationParameter globalOperationParameter : globalOperationParameters) {
             parameters.add(new ParameterBuilder()
                     .name(globalOperationParameter.getName())
@@ -194,7 +195,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             List<SwaggerProperties.GlobalOperationParameter> globalOperationParameters,
             List<SwaggerProperties.GlobalOperationParameter> docketOperationParameters) {
 
-        if (docketOperationParameters == null || docketOperationParameters.isEmpty()) {
+        if (Objects.isNull(docketOperationParameters) || docketOperationParameters.isEmpty()) {
             return buildGlobalOperationParametersFromSwaggerProperties(globalOperationParameters);
         }
 
@@ -204,11 +205,14 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
         List<SwaggerProperties.GlobalOperationParameter> resultOperationParameters = Lists.newArrayList();
 
-        for (SwaggerProperties.GlobalOperationParameter parameter : globalOperationParameters) {
-            if (!docketNames.contains(parameter.getName())) {
-                resultOperationParameters.add(parameter);
+        if (Objects.nonNull(globalOperationParameters)) {
+            for (SwaggerProperties.GlobalOperationParameter parameter : globalOperationParameters) {
+                if (!docketNames.contains(parameter.getName())) {
+                    resultOperationParameters.add(parameter);
+                }
             }
         }
+
         resultOperationParameters.addAll(docketOperationParameters);
         return buildGlobalOperationParametersFromSwaggerProperties(resultOperationParameters);
     }
