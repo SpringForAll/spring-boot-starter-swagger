@@ -1,5 +1,7 @@
 # 简介
 
+[![Build Status](https://travis-ci.org/dyc87112/spring-boot-starter-swagger.svg?branch=master)](https://travis-ci.org/dyc87112/spring-boot-starter-swagger)
+
 该项目主要利用Spring Boot的自动化配置特性来实现快速的将swagger2引入spring boot应用来生成API文档，简化原生使用swagger2的整合代码。
 
 - 源码地址
@@ -26,7 +28,7 @@
 <dependency>
 	<groupId>com.didispace</groupId>
 	<artifactId>spring-boot-starter-swagger</artifactId>
-	<version>1.3.0.RELEASE</version>
+	<version>1.4.1.RELEASE</version>
 </dependency>
 ```
 
@@ -53,9 +55,11 @@ public class Bootstrap {
 ## 配置示例
 
 ```properties
+swagger.enabled=true
+
 swagger.title=spring-boot-starter-swagger
 swagger.description=Starter for swagger 2.x
-swagger.version=1.3.0.RELEASE
+swagger.version=1.4.0.RELEASE
 swagger.license=Apache License, Version 2.0
 swagger.licenseUrl=https://www.apache.org/licenses/LICENSE-2.0.html
 swagger.termsOfServiceUrl=https://github.com/dyc87112/spring-boot-starter-swagger
@@ -65,6 +69,17 @@ swagger.contact.email=dyc87112@qq.com
 swagger.base-package=com.didispace
 swagger.base-path=/**
 swagger.exclude-path=/error, /ops/**
+
+swagger.globalOperationParameters[0].name=name one
+swagger.globalOperationParameters[0].description=some description one
+swagger.globalOperationParameters[0].modelRef=string
+swagger.globalOperationParameters[0].parameterType=header
+swagger.globalOperationParameters[0].required=true
+swagger.globalOperationParameters[1].name=name two
+swagger.globalOperationParameters[1].description=some description two
+swagger.globalOperationParameters[1].modelRef=string
+swagger.globalOperationParameters[1].parameterType=body
+swagger.globalOperationParameters[1].required=false
 ```
 
 ## 配置说明
@@ -72,6 +87,7 @@ swagger.exclude-path=/error, /ops/**
 ### 默认配置
 
 ```
+- swagger.enabled=是否启用swagger，默认：true
 - swagger.title=标题
 - swagger.description=描述
 - swagger.version=版本
@@ -85,9 +101,19 @@ swagger.exclude-path=/error, /ops/**
 - swagger.base-path=需要处理的基础URL规则，默认：/**
 - swagger.exclude-path=需要排除的URL规则，默认：空
 - swagger.host=文档的host信息，默认：空
+- swagger.globalOperationParameters[0].name=参数名
+- swagger.globalOperationParameters[0].description=描述信息
+- swagger.globalOperationParameters[0].modelRef=指定参数类型
+- swagger.globalOperationParameters[0].parameterType=指定参数存放位置,可选header,query,path,body.form
+- swagger.globalOperationParameters[0].required=指定参数是否必传，true,false
 ```
 
-> host属性从1.3.0.RELEASE开始支持
+
+> `1.3.0.RELEASE`新增：`swagger.host`属性，同时也支持指定docket的配置
+>
+> `1.4.0.RELEASE`新增：
+> - `swagger.enabled`：用于开关swagger的配置
+> - `swagger.globalOperationParameters`：用于设置全局的参数，比如：header部分的accessToken等。该参数支持指定docket的配置。
 
 ### Path规则说明
 
@@ -129,9 +155,18 @@ swagger.exclude-path=/ops/**, /error
 - swagger.docket.<name>.base-package=swagger扫描的基础包，默认：全扫描
 - swagger.docket.<name>.base-path=需要处理的基础URL规则，默认：/**
 - swagger.docket.<name>.exclude-path=需要排除的URL规则，默认：空
+- swagger.docket.<name>.name=参数名
+- swagger.docket.<name>.modelRef=指定参数类型
+- swagger.docket.<name>.parameterType=指定参数存放位置,可选header,query,path,body.form
+- swagger.docket.<name>.required=true=指定参数是否必传，true,false
+- swagger.docket.<name>.globalOperationParameters[0].name=参数名
+- swagger.docket.<name>.globalOperationParameters[0].description=描述信息
+- swagger.docket.<name>.globalOperationParameters[0].modelRef=指定参数存放位置,可选header,query,path,body.form
+- swagger.docket.<name>.globalOperationParameters[0].parameterType=指定参数是否必传，true,false
 ```
 
 说明：`<name>`为swagger文档的分组名称，同一个项目中可以配置多个分组，用来划分不同的API文档。
+
 
 **分组配置示例**
 
@@ -144,12 +179,16 @@ swagger.docket.aaa.contact.name=zhaiyongchao
 swagger.docket.aaa.contact.url=http://spring4all.com/
 swagger.docket.aaa.contact.email=didi@potatomato.club
 swagger.docket.aaa.excludePath=/ops/**
+swagger.docket.aaa.globalOperationParameters[0].name=name three
+swagger.docket.aaa.globalOperationParameters[0].description=some description three override
+swagger.docket.aaa.globalOperationParameters[0].modelRef=string
+swagger.docket.aaa.globalOperationParameters[0].parameterType=header
 
 swagger.docket.bbb.title=group-bbb
 swagger.docket.bbb.basePackage=com.yonghui
 ```
 
-说明：默认配置与分组配置可以一起使用。在分组配置中没有配置的内容将使用默认配置替代，所以默认配置可以作为分组配置公共部分属性的配置。
+说明：默认配置与分组配置可以一起使用。在分组配置中没有配置的内容将使用默认配置替代，所以默认配置可以作为分组配置公共部分属性的配置。`swagger.docket.aaa.globalOperationParameters[0].name`会覆盖同名的全局配置。
 
 ### JSR-303校验注解支持
 
