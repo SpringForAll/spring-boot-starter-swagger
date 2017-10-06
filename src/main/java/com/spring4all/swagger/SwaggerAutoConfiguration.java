@@ -1,4 +1,4 @@
-package com.didispace.swagger;
+package com.spring4all.swagger;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;

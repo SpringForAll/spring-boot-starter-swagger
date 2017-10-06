@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.didispace</groupId>
+    <groupId>com.spring4all</groupId>
     <artifactId>spring-boot-starter-swagger</artifactId>
     <version>1.5.0.SNAPSHOT</version>
 
     <name>spring-boot-starter-swagger</name>
-    <url>https://github.com/dyc87112/spring-boot-starter-swagger</url>
+    <url>https://github.com/SpringForAll/spring-boot-starter-swagger</url>
     <description>starter for swagger2</description>
 
     <parent>
@@ -27,9 +27,9 @@
     </licenses>
 
     <scm>
-        <url>http://didispace.com</url>
-        <connection>git@github.com:dyc87112/spring-boot-starter-swagger.git</connection>
-        <developerConnection>https://github.com/dyc87112/spring-boot-starter-swagger</developerConnection>
+        <url>http://spring4all.com</url>
+        <connection>git@github.com:SpringForAll/spring-boot-starter-swagger.git</connection>
+        <developerConnection>https://github.com/SpringForAll/spring-boot-starter-swagger</developerConnection>
     </scm>
 
     <developers>
