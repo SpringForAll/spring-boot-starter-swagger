@@ -1,4 +1,4 @@
-package com.didispace.swagger;
+package com.spring4all.swagger;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;

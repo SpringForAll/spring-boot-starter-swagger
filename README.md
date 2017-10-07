@@ -1,6 +1,6 @@
 # 简介
 
-[![Build Status](https://travis-ci.org/dyc87112/spring-boot-starter-swagger.svg?branch=master)](https://travis-ci.org/dyc87112/spring-boot-starter-swagger)
+[![Build Status](https://travis-ci.org/dyc87112/spring-boot-starter-swagger.svg?branch=1.5.0)](https://travis-ci.org/dyc87112/spring-boot-starter-swagger)
 
 该项目主要利用Spring Boot的自动化配置特性来实现快速的将swagger2引入spring boot应用来生成API文档，简化原生使用swagger2的整合代码。
 
@@ -26,9 +26,9 @@
 
 ```xml
 <dependency>
-	<groupId>com.didispace</groupId>
+	<groupId>com.spring4all</groupId>
 	<artifactId>spring-boot-starter-swagger</artifactId>
-	<version>1.4.1.RELEASE</version>
+	<version>1.5.0.RELEASE</version>
 </dependency>
 ```
 
