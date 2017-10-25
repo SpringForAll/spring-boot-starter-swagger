@@ -50,6 +50,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     @ConditionalOnProperty(name = "swagger.enabled", matchIfMissing = true)
     public List<Docket> createRestApi(SwaggerProperties swaggerProperties) {
         ConfigurableBeanFactory configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
+        List<Docket> docketList = new LinkedList<>();
 
         // 没有分组
         if (swaggerProperties.getDocket().size() == 0) {
@@ -81,7 +82,6 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 excludePath.add(PathSelectors.ant(path));
             }
 
-
             Docket docket = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
@@ -98,11 +98,11 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     .build();
 
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
-            return null;
+            docketList.add(docket);
+            return docketList;
         }
 
         // 分组创建
-        List<Docket> docketList = new LinkedList<>();
         for (String groupName : swaggerProperties.getDocket().keySet()) {
             SwaggerProperties.DocketInfo docketInfo = swaggerProperties.getDocket().get(groupName);
 
