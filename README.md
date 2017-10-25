@@ -28,7 +28,7 @@
 <dependency>
 	<groupId>com.spring4all</groupId>
 	<artifactId>spring-boot-starter-swagger</artifactId>
-	<version>1.5.0.RELEASE</version>
+	<version>1.5.1.RELEASE</version>
 </dependency>
 ```
 
