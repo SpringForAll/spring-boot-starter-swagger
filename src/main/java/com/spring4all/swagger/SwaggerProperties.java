@@ -54,6 +54,11 @@ public class SwaggerProperties {
     /**全局参数配置**/
     private List<GlobalOperationParameter> globalOperationParameters;
 
+    /** 是否使用默认预定义的响应消息 ，默认 true **/
+    private Boolean applyDefaultResponseMessages = true;
+
+    /** 全局响应消息 ，目前支持 GET **/
+    private GlobalResponseMessage globalResponseMessage;
 
     @Data
     @NoArgsConstructor
@@ -117,6 +122,17 @@ public class SwaggerProperties {
         /**联系人email**/
         private String email = "";
 
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class GlobalResponseMessage {
+
+        /** 401 响应消息 **/
+        private String message401;
+
+        /** 401 响应体 **/
+        private String modelRef401;
     }
 
 }

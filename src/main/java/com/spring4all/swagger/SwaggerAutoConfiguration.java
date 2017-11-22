@@ -12,15 +12,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
+import org.springframework.util.StringUtils;
+import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.Parameter;
+import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
+import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.*;
@@ -82,21 +82,37 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 excludePath.add(PathSelectors.ant(path));
             }
 
-            Docket docket = new Docket(DocumentationType.SWAGGER_2)
+            Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
                     .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
-                            swaggerProperties.getGlobalOperationParameters()))
-                    .select()
+                            swaggerProperties.getGlobalOperationParameters()));
+
+            // 全局响应消息
+            if (!swaggerProperties.getApplyDefaultResponseMessages()) {
+
+                ResponseMessageBuilder responseMessageBuilder401 = new ResponseMessageBuilder()
+                        .code(401)
+                        .message(swaggerProperties.getGlobalResponseMessage().getMessage401());
+                if (!StringUtils.isEmpty(swaggerProperties.getGlobalResponseMessage().getModelRef401()))
+                    responseMessageBuilder401.responseModel(
+                            new ModelRef(swaggerProperties.getGlobalResponseMessage().getModelRef401()));
+
+
+                List<ResponseMessage> responseMessages = new ArrayList();
+                responseMessages.add(responseMessageBuilder401.build());
+                docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
+                        .globalResponseMessage(RequestMethod.GET,responseMessages);
+            }
+
+            Docket docket = docketForBuilder.select()
                     .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                     .paths(
                             Predicates.and(
                                     Predicates.not(Predicates.or(excludePath)),
                                     Predicates.or(basePath)
                             )
-                    )
-                    .build();
-
+                    ).build();
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
             docketList.add(docket);
             return docketList;
