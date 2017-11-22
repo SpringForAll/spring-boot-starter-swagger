@@ -90,19 +90,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
             // 全局响应消息
             if (!swaggerProperties.getApplyDefaultResponseMessages()) {
-
-                ResponseMessageBuilder responseMessageBuilder401 = new ResponseMessageBuilder()
-                        .code(401)
-                        .message(swaggerProperties.getGlobalResponseMessage().getMessage401());
-                if (!StringUtils.isEmpty(swaggerProperties.getGlobalResponseMessage().getModelRef401()))
-                    responseMessageBuilder401.responseModel(
-                            new ModelRef(swaggerProperties.getGlobalResponseMessage().getModelRef401()));
-
-
-                List<ResponseMessage> responseMessages = new ArrayList();
-                responseMessages.add(responseMessageBuilder401.build());
-                docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
-                        .globalResponseMessage(RequestMethod.GET,responseMessages);
+                buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
             }
 
             Docket docket = docketForBuilder.select()
@@ -176,10 +164,14 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
         return docketList;
     }
 
+
+
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
     }
+
+
 
     private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(
             List<SwaggerProperties.GlobalOperationParameter> globalOperationParameters) {
@@ -231,5 +223,32 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
         resultOperationParameters.addAll(docketOperationParameters);
         return buildGlobalOperationParametersFromSwaggerProperties(resultOperationParameters);
+    }
+
+    /**
+     * 设置全局响应消息
+     *
+     * @param swaggerProperties
+     * @param docketForBuilder
+     */
+    private void buildGlobalResponseMessage(SwaggerProperties swaggerProperties, Docket docketForBuilder) {
+        List<ResponseMessage> responseMessages = new ArrayList();
+        List<SwaggerProperties.GlobalResponseMessage> globalResponseMessages =
+                swaggerProperties.getGlobalResponseMessages();
+        for (SwaggerProperties.GlobalResponseMessage globalResponseMessage : globalResponseMessages) {
+            ResponseMessageBuilder responseMessageBuilder = new ResponseMessageBuilder();
+            responseMessageBuilder
+                    .code(globalResponseMessage.getCode())
+                    .message(globalResponseMessage.getMessage());
+
+            if (!StringUtils.isEmpty(globalResponseMessage.getModelRef())) {
+                responseMessageBuilder
+                        .responseModel(new ModelRef(globalResponseMessage.getModelRef()));
+            }
+            responseMessages.add(responseMessageBuilder.build());
+        }
+
+        docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
+                .globalResponseMessage(RequestMethod.GET,responseMessages);
     }
 }

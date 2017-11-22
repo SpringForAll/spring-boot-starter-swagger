@@ -58,7 +58,7 @@ public class SwaggerProperties {
     private Boolean applyDefaultResponseMessages = true;
 
     /** 全局响应消息 ，目前支持 GET **/
-    private GlobalResponseMessage globalResponseMessage;
+    private List<GlobalResponseMessage> globalResponseMessages;
 
     @Data
     @NoArgsConstructor
@@ -128,11 +128,14 @@ public class SwaggerProperties {
     @NoArgsConstructor
     public static class GlobalResponseMessage {
 
-        /** 401 响应消息 **/
-        private String message401;
+        /** 响应码 **/
+        private int code;
 
-        /** 401 响应体 **/
-        private String modelRef401;
+        /** 响应消息 **/
+        private String message;
+
+        /** 响应体 **/
+        private String modelRef;
     }
 
 }
