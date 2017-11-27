@@ -12,15 +12,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
+import org.springframework.util.StringUtils;
+import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.Parameter;
+import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
+import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.*;
@@ -82,21 +82,25 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 excludePath.add(PathSelectors.ant(path));
             }
 
-            Docket docket = new Docket(DocumentationType.SWAGGER_2)
+            Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
                     .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
-                            swaggerProperties.getGlobalOperationParameters()))
-                    .select()
+                            swaggerProperties.getGlobalOperationParameters()));
+
+            // 全局响应消息
+            if (!swaggerProperties.getApplyDefaultResponseMessages()) {
+                buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
+            }
+
+            Docket docket = docketForBuilder.select()
                     .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                     .paths(
                             Predicates.and(
                                     Predicates.not(Predicates.or(excludePath)),
                                     Predicates.or(basePath)
                             )
-                    )
-                    .build();
-
+                    ).build();
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
             docketList.add(docket);
             return docketList;
@@ -138,12 +142,18 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 excludePath.add(PathSelectors.ant(path));
             }
 
-            Docket docket = new Docket(DocumentationType.SWAGGER_2)
+            Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .globalOperationParameters(assemblyGlobalOperationParameters(swaggerProperties.getGlobalOperationParameters(),
-                            docketInfo.getGlobalOperationParameters()))
-                    .groupName(groupName)
+                    .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
+                            swaggerProperties.getGlobalOperationParameters()));
+
+            // 全局响应消息
+            if (!swaggerProperties.getApplyDefaultResponseMessages()) {
+                buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
+            }
+
+            Docket docket = docketForBuilder.groupName(groupName)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
                     .paths(
@@ -160,10 +170,14 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
         return docketList;
     }
 
+
+
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
     }
+
+
 
     private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(
             List<SwaggerProperties.GlobalOperationParameter> globalOperationParameters) {
@@ -215,5 +229,32 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
         resultOperationParameters.addAll(docketOperationParameters);
         return buildGlobalOperationParametersFromSwaggerProperties(resultOperationParameters);
+    }
+
+    /**
+     * 设置全局响应消息
+     *
+     * @param swaggerProperties
+     * @param docketForBuilder
+     */
+    private void buildGlobalResponseMessage(SwaggerProperties swaggerProperties, Docket docketForBuilder) {
+        List<ResponseMessage> responseMessages = new ArrayList();
+        List<SwaggerProperties.GlobalResponseMessage> globalResponseMessages =
+                swaggerProperties.getGlobalResponseMessages();
+        for (SwaggerProperties.GlobalResponseMessage globalResponseMessage : globalResponseMessages) {
+            ResponseMessageBuilder responseMessageBuilder = new ResponseMessageBuilder();
+            responseMessageBuilder
+                    .code(globalResponseMessage.getCode())
+                    .message(globalResponseMessage.getMessage());
+
+            if (!StringUtils.isEmpty(globalResponseMessage.getModelRef())) {
+                responseMessageBuilder
+                        .responseModel(new ModelRef(globalResponseMessage.getModelRef()));
+            }
+            responseMessages.add(responseMessageBuilder.build());
+        }
+
+        docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
+                .globalResponseMessage(RequestMethod.GET,responseMessages);
     }
 }
