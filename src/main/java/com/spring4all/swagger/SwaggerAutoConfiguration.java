@@ -142,12 +142,18 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 excludePath.add(PathSelectors.ant(path));
             }
 
-            Docket docket = new Docket(DocumentationType.SWAGGER_2)
+            Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .globalOperationParameters(assemblyGlobalOperationParameters(swaggerProperties.getGlobalOperationParameters(),
-                            docketInfo.getGlobalOperationParameters()))
-                    .groupName(groupName)
+                    .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
+                            swaggerProperties.getGlobalOperationParameters()));
+
+            // 全局响应消息
+            if (!swaggerProperties.getApplyDefaultResponseMessages()) {
+                buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
+            }
+
+            Docket docket = docketForBuilder.groupName(groupName)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
                     .paths(
