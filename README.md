@@ -215,7 +215,9 @@ swagger.docket.bbb.basePackage=com.yonghui
 - `@Pattern`
 
 ### 自定义全局响应消息配置
+
 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 全局响应消息配置，配置如下
+
 ```$xslt
 // 取消使用默认预定义的响应消息,并使用自定义响应消息
 swagger.apply-default-response-messages=false
