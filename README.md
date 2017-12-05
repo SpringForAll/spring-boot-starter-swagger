@@ -80,6 +80,17 @@ swagger.globalOperationParameters[1].description=some description two
 swagger.globalOperationParameters[1].modelRef=string
 swagger.globalOperationParameters[1].parameterType=body
 swagger.globalOperationParameters[1].required=false
+
+// 取消使用默认预定义的响应消息,并使用自定义响应消息
+swagger.apply-default-response-messages=false
+swagger.global-response-message.get[0].code=401
+swagger.global-response-message.get[0].message=401get
+swagger.global-response-message.get[1].code=500
+swagger.global-response-message.get[1].message=500get
+swagger.global-response-message.get[1].modelRef=ERROR
+swagger.global-response-message.post[0].code=500
+swagger.global-response-message.post[0].message=500post
+swagger.global-response-message.post[0].modelRef=ERROR
 ```
 
 ## 配置说明
@@ -203,7 +214,25 @@ swagger.docket.bbb.basePackage=com.yonghui
 - `@Size`
 - `@Pattern`
 
+### 自定义全局响应消息配置
+
+支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 全局响应消息配置，配置如下
+
+```$xslt
+// 取消使用默认预定义的响应消息,并使用自定义响应消息
+swagger.apply-default-response-messages=false
+swagger.global-response-message.get[0].code=401
+swagger.global-response-message.get[0].message=401get
+swagger.global-response-message.get[1].code=500
+swagger.global-response-message.get[1].message=500get
+swagger.global-response-message.get[1].modelRef=ERROR
+swagger.global-response-message.post[0].code=500
+swagger.global-response-message.post[0].message=500post
+swagger.global-response-message.post[0].modelRef=ERROR
+```
+
 ## 贡献者
 
 - [程序猿DD-翟永超](https://github.com/dyc87112/)
 - [小火](https://renlulu.github.io/)
+- [泥瓦匠BYSocket](https://github.com/JeffLi1993)

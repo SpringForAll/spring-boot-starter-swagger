@@ -145,8 +145,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
-                            swaggerProperties.getGlobalOperationParameters()));
+                    .globalOperationParameters(assemblyGlobalOperationParameters(swaggerProperties.getGlobalOperationParameters(),
+                            docketInfo.getGlobalOperationParameters()));
 
             // 全局响应消息
             if (!swaggerProperties.getApplyDefaultResponseMessages()) {
@@ -171,12 +171,10 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     }
 
 
-
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
     }
-
 
 
     private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(
@@ -234,27 +232,53 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     /**
      * 设置全局响应消息
      *
-     * @param swaggerProperties
+     * @param swaggerProperties 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE
      * @param docketForBuilder
      */
     private void buildGlobalResponseMessage(SwaggerProperties swaggerProperties, Docket docketForBuilder) {
-        List<ResponseMessage> responseMessages = new ArrayList();
-        List<SwaggerProperties.GlobalResponseMessage> globalResponseMessages =
-                swaggerProperties.getGlobalResponseMessages();
-        for (SwaggerProperties.GlobalResponseMessage globalResponseMessage : globalResponseMessages) {
-            ResponseMessageBuilder responseMessageBuilder = new ResponseMessageBuilder();
-            responseMessageBuilder
-                    .code(globalResponseMessage.getCode())
-                    .message(globalResponseMessage.getMessage());
 
-            if (!StringUtils.isEmpty(globalResponseMessage.getModelRef())) {
-                responseMessageBuilder
-                        .responseModel(new ModelRef(globalResponseMessage.getModelRef()));
+        SwaggerProperties.GlobalResponseMessage globalResponseMessages =
+                swaggerProperties.getGlobalResponseMessage();
+
+        // POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 响应消息体
+        List<ResponseMessage> postResponseMessages      = getResponseMessageList(globalResponseMessages.getPost());
+        List<ResponseMessage> getResponseMessages       = getResponseMessageList(globalResponseMessages.getGet());
+        List<ResponseMessage> putResponseMessages       = getResponseMessageList(globalResponseMessages.getPut());
+        List<ResponseMessage> patchResponseMessages     = getResponseMessageList(globalResponseMessages.getPatch());
+        List<ResponseMessage> deleteResponseMessages    = getResponseMessageList(globalResponseMessages.getDelete());
+        List<ResponseMessage> headResponseMessages      = getResponseMessageList(globalResponseMessages.getHead());
+        List<ResponseMessage> optionsResponseMessages   = getResponseMessageList(globalResponseMessages.getOptions());
+        List<ResponseMessage> trackResponseMessages     = getResponseMessageList(globalResponseMessages.getTrace());
+
+        docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
+                .globalResponseMessage(RequestMethod.POST,      postResponseMessages)
+                .globalResponseMessage(RequestMethod.GET,       getResponseMessages)
+                .globalResponseMessage(RequestMethod.PUT,       putResponseMessages)
+                .globalResponseMessage(RequestMethod.PATCH,     patchResponseMessages)
+                .globalResponseMessage(RequestMethod.DELETE,    deleteResponseMessages)
+                .globalResponseMessage(RequestMethod.HEAD,      headResponseMessages)
+                .globalResponseMessage(RequestMethod.OPTIONS,   optionsResponseMessages)
+                .globalResponseMessage(RequestMethod.TRACE,     trackResponseMessages);
+    }
+
+    /**
+     * 获取返回消息体列表
+     *
+     * @param globalResponseMessageBodyList
+     * @return
+     */
+    private List<ResponseMessage> getResponseMessageList(List<SwaggerProperties.GlobalResponseMessageBody> globalResponseMessageBodyList) {
+        List<ResponseMessage> responseMessages = new ArrayList<>();
+        for (SwaggerProperties.GlobalResponseMessageBody globalResponseMessageBody : globalResponseMessageBodyList) {
+            ResponseMessageBuilder responseMessageBuilder = new ResponseMessageBuilder();
+            responseMessageBuilder.code(globalResponseMessageBody.getCode()).message(globalResponseMessageBody.getMessage());
+
+            if (!StringUtils.isEmpty(globalResponseMessageBody.getModelRef())) {
+                responseMessageBuilder.responseModel(new ModelRef(globalResponseMessageBody.getModelRef()));
             }
             responseMessages.add(responseMessageBuilder.build());
         }
 
-        docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
-                .globalResponseMessage(RequestMethod.GET,responseMessages);
+        return responseMessages;
     }
 }

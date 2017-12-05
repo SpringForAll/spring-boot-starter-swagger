@@ -3,7 +3,6 @@ package com.spring4all.swagger;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import springfox.documentation.schema.ModelRef;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -57,8 +56,8 @@ public class SwaggerProperties {
     /** 是否使用默认预定义的响应消息 ，默认 true **/
     private Boolean applyDefaultResponseMessages = true;
 
-    /** 全局响应消息 ，目前支持 GET **/
-    private List<GlobalResponseMessage> globalResponseMessages;
+    /** 全局响应消息 **/
+    private GlobalResponseMessage globalResponseMessage;
 
     @Data
     @NoArgsConstructor
@@ -128,6 +127,36 @@ public class SwaggerProperties {
     @NoArgsConstructor
     public static class GlobalResponseMessage {
 
+        /** POST 响应消息体 **/
+        List<GlobalResponseMessageBody> post = new ArrayList<>();
+
+        /** GET 响应消息体 **/
+        List<GlobalResponseMessageBody> get = new ArrayList<>();
+
+        /** PUT 响应消息体 **/
+        List<GlobalResponseMessageBody> put = new ArrayList<>();
+
+        /** PATCH 响应消息体 **/
+        List<GlobalResponseMessageBody> patch = new ArrayList<>();
+
+        /** DELETE 响应消息体 **/
+        List<GlobalResponseMessageBody> delete = new ArrayList<>();
+
+        /** HEAD 响应消息体 **/
+        List<GlobalResponseMessageBody> head = new ArrayList<>();
+
+        /** OPTIONS 响应消息体 **/
+        List<GlobalResponseMessageBody> options = new ArrayList<>();
+
+        /** TRACE 响应消息体 **/
+        List<GlobalResponseMessageBody> trace = new ArrayList<>();
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class GlobalResponseMessageBody {
+
         /** 响应码 **/
         private int code;
 
@@ -136,6 +165,7 @@ public class SwaggerProperties {
 
         /** 响应体 **/
         private String modelRef;
+
     }
 
 }
