@@ -117,6 +117,12 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                                     Predicates.or(basePath)
                             )
                     ).build();
+
+            /** ignoredParameterTypes **/
+            Class[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
+            Class[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
+            docket.ignoredParameterTypes(ignoredParameterTypes);
+
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
             docketList.add(docket);
             return docketList;
@@ -179,6 +185,11 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                             )
                     )
                     .build();
+
+            /** ignoredParameterTypes **/
+            Class[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
+            Class[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
+            docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton(groupName, docket);
             docketList.add(docket);

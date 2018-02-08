@@ -260,6 +260,22 @@ swagger.ui-config.show-request-headers=true
 swagger.ui-config.request-timeout=5000
 ```
 
+### ignoredParameterTypes配置（1.6.0 + 支持）
+
+```properties
+# 基础配置
+swagger.ignored-parameter-types[0]=com.didispace.demo.User
+swagger.ignored-parameter-types[1]=com.didispace.demo.Product
+
+# 分组配置
+swagger.docket.aaa.ignored-parameter-types[0]=com.didispace.demo.User
+swagger.docket.aaa.ignored-parameter-types[1]=com.didispace.demo.Product
+```
+
+> 该参数作用：
+> Q. Infinite loop when springfox tries to determine schema for objects with nested/complex constraints?
+> A. If you have recursively defined objects, I would try and see if providing an alternate type might work or perhaps even ignoring the offending classes e.g. order using the docket. ignoredParameterTypes(Order.class). This is usually found in Hibernate domain objects that have bidirectional dependencies on other objects.
+
 ## 贡献者
 
 - [程序猿DD-翟永超](https://github.com/dyc87112/)

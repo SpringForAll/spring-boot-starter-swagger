@@ -34,6 +34,9 @@ public class SwaggerProperties {
     /**服务条款URL**/
     private String termsOfServiceUrl = "";
 
+    /**忽略的参数类型**/
+    private List<Class> ignoredParameterTypes = new ArrayList<>();
+
     private Contact contact = new Contact();
 
     /**swagger会解析的包路径**/
@@ -111,6 +114,9 @@ public class SwaggerProperties {
         private List<String> excludePath = new ArrayList<>();
 
         private List<GlobalOperationParameter> globalOperationParameters;
+
+        /**忽略的参数类型**/
+        private List<Class> ignoredParameterTypes = new ArrayList<>();
 
     }
 
