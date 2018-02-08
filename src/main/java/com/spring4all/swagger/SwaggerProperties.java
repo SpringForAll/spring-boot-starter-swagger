@@ -53,11 +53,15 @@ public class SwaggerProperties {
     /**全局参数配置**/
     private List<GlobalOperationParameter> globalOperationParameters;
 
+    /** 页面功能配置 **/
+    private UiConfig uiConfig = new UiConfig();
+
     /** 是否使用默认预定义的响应消息 ，默认 true **/
     private Boolean applyDefaultResponseMessages = true;
 
     /** 全局响应消息 **/
     private GlobalResponseMessage globalResponseMessage;
+
 
     @Data
     @NoArgsConstructor
@@ -165,6 +169,27 @@ public class SwaggerProperties {
 
         /** 响应体 **/
         private String modelRef;
+
+    }
+
+
+    @Data
+    @NoArgsConstructor
+    public static class UiConfig {
+
+        private String validatorUrl;
+        private String docExpansion = "none";    // none | list
+        private String apiSorter = "alpha";       // alpha
+        private String defaultModelRendering = "schema";   // schema
+
+        /** 是否启用json编辑器 **/
+        private Boolean jsonEditor = false;
+        /** 是否显示请求头信息 **/
+        private Boolean showRequestHeaders = true;
+        /** 支持页面提交的请求类型 **/
+        private String submitMethods = "get,post,put,delete,patch";
+        /** 请求超时时间 **/
+        private Long requestTimeout = 10000L;
 
     }
 

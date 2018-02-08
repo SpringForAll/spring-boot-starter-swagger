@@ -7,12 +7,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
@@ -20,8 +22,8 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.service.Parameter;
 import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
-import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.UiConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +48,21 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     }
 
     @Bean
+    public UiConfiguration uiConfiguration(SwaggerProperties swaggerProperties) {
+        return new UiConfiguration(
+                swaggerProperties.getUiConfig().getValidatorUrl(),// url
+                swaggerProperties.getUiConfig().getDocExpansion(),       // docExpansion          => none | list
+                swaggerProperties.getUiConfig().getApiSorter(),      // apiSorter             => alpha
+                swaggerProperties.getUiConfig().getDefaultModelRendering(),     // defaultModelRendering => schema
+                swaggerProperties.getUiConfig().getSubmitMethods().split(","),
+                swaggerProperties.getUiConfig().getJsonEditor(),        // enableJsonEditor      => true | false
+                swaggerProperties.getUiConfig().getShowRequestHeaders(),         // showRequestHeaders    => true | false
+                swaggerProperties.getUiConfig().getRequestTimeout());      // requestTimeout => in milliseconds, defaults to null (uses jquery xh timeout)
+    }
+
+    @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnBean(UiConfiguration.class)
     @ConditionalOnProperty(name = "swagger.enabled", matchIfMissing = true)
     public List<Docket> createRestApi(SwaggerProperties swaggerProperties) {
         ConfigurableBeanFactory configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
