@@ -7,21 +7,23 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMethod;
+import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.Parameter;
+import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.UiConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,7 +48,21 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     }
 
     @Bean
+    public UiConfiguration uiConfiguration(SwaggerProperties swaggerProperties) {
+        return new UiConfiguration(
+                swaggerProperties.getUiConfig().getValidatorUrl(),// url
+                swaggerProperties.getUiConfig().getDocExpansion(),       // docExpansion          => none | list
+                swaggerProperties.getUiConfig().getApiSorter(),      // apiSorter             => alpha
+                swaggerProperties.getUiConfig().getDefaultModelRendering(),     // defaultModelRendering => schema
+                swaggerProperties.getUiConfig().getSubmitMethods().split(","),
+                swaggerProperties.getUiConfig().getJsonEditor(),        // enableJsonEditor      => true | false
+                swaggerProperties.getUiConfig().getShowRequestHeaders(),         // showRequestHeaders    => true | false
+                swaggerProperties.getUiConfig().getRequestTimeout());      // requestTimeout => in milliseconds, defaults to null (uses jquery xh timeout)
+    }
+
+    @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnBean(UiConfiguration.class)
     @ConditionalOnProperty(name = "swagger.enabled", matchIfMissing = true)
     public List<Docket> createRestApi(SwaggerProperties swaggerProperties) {
         ConfigurableBeanFactory configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
@@ -82,20 +98,30 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 excludePath.add(PathSelectors.ant(path));
             }
 
-            Docket docket = new Docket(DocumentationType.SWAGGER_2)
+            Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
                     .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
-                            swaggerProperties.getGlobalOperationParameters()))
-                    .select()
+                            swaggerProperties.getGlobalOperationParameters()));
+
+            // 全局响应消息
+            if (!swaggerProperties.getApplyDefaultResponseMessages()) {
+                buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
+            }
+
+            Docket docket = docketForBuilder.select()
                     .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                     .paths(
                             Predicates.and(
                                     Predicates.not(Predicates.or(excludePath)),
                                     Predicates.or(basePath)
                             )
-                    )
-                    .build();
+                    ).build();
+
+            /** ignoredParameterTypes **/
+            Class[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
+            Class[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
+            docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
             docketList.add(docket);
@@ -138,12 +164,18 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 excludePath.add(PathSelectors.ant(path));
             }
 
-            Docket docket = new Docket(DocumentationType.SWAGGER_2)
+            Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
                     .globalOperationParameters(assemblyGlobalOperationParameters(swaggerProperties.getGlobalOperationParameters(),
-                            docketInfo.getGlobalOperationParameters()))
-                    .groupName(groupName)
+                            docketInfo.getGlobalOperationParameters()));
+
+            // 全局响应消息
+            if (!swaggerProperties.getApplyDefaultResponseMessages()) {
+                buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
+            }
+
+            Docket docket = docketForBuilder.groupName(groupName)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
                     .paths(
@@ -154,16 +186,23 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     )
                     .build();
 
+            /** ignoredParameterTypes **/
+            Class[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
+            Class[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
+            docket.ignoredParameterTypes(ignoredParameterTypes);
+
             configurableBeanFactory.registerSingleton(groupName, docket);
             docketList.add(docket);
         }
         return docketList;
     }
 
+
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
     }
+
 
     private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(
             List<SwaggerProperties.GlobalOperationParameter> globalOperationParameters) {
@@ -215,5 +254,58 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
         resultOperationParameters.addAll(docketOperationParameters);
         return buildGlobalOperationParametersFromSwaggerProperties(resultOperationParameters);
+    }
+
+    /**
+     * 设置全局响应消息
+     *
+     * @param swaggerProperties 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE
+     * @param docketForBuilder
+     */
+    private void buildGlobalResponseMessage(SwaggerProperties swaggerProperties, Docket docketForBuilder) {
+
+        SwaggerProperties.GlobalResponseMessage globalResponseMessages =
+                swaggerProperties.getGlobalResponseMessage();
+
+        // POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 响应消息体
+        List<ResponseMessage> postResponseMessages      = getResponseMessageList(globalResponseMessages.getPost());
+        List<ResponseMessage> getResponseMessages       = getResponseMessageList(globalResponseMessages.getGet());
+        List<ResponseMessage> putResponseMessages       = getResponseMessageList(globalResponseMessages.getPut());
+        List<ResponseMessage> patchResponseMessages     = getResponseMessageList(globalResponseMessages.getPatch());
+        List<ResponseMessage> deleteResponseMessages    = getResponseMessageList(globalResponseMessages.getDelete());
+        List<ResponseMessage> headResponseMessages      = getResponseMessageList(globalResponseMessages.getHead());
+        List<ResponseMessage> optionsResponseMessages   = getResponseMessageList(globalResponseMessages.getOptions());
+        List<ResponseMessage> trackResponseMessages     = getResponseMessageList(globalResponseMessages.getTrace());
+
+        docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
+                .globalResponseMessage(RequestMethod.POST,      postResponseMessages)
+                .globalResponseMessage(RequestMethod.GET,       getResponseMessages)
+                .globalResponseMessage(RequestMethod.PUT,       putResponseMessages)
+                .globalResponseMessage(RequestMethod.PATCH,     patchResponseMessages)
+                .globalResponseMessage(RequestMethod.DELETE,    deleteResponseMessages)
+                .globalResponseMessage(RequestMethod.HEAD,      headResponseMessages)
+                .globalResponseMessage(RequestMethod.OPTIONS,   optionsResponseMessages)
+                .globalResponseMessage(RequestMethod.TRACE,     trackResponseMessages);
+    }
+
+    /**
+     * 获取返回消息体列表
+     *
+     * @param globalResponseMessageBodyList
+     * @return
+     */
+    private List<ResponseMessage> getResponseMessageList(List<SwaggerProperties.GlobalResponseMessageBody> globalResponseMessageBodyList) {
+        List<ResponseMessage> responseMessages = new ArrayList<>();
+        for (SwaggerProperties.GlobalResponseMessageBody globalResponseMessageBody : globalResponseMessageBodyList) {
+            ResponseMessageBuilder responseMessageBuilder = new ResponseMessageBuilder();
+            responseMessageBuilder.code(globalResponseMessageBody.getCode()).message(globalResponseMessageBody.getMessage());
+
+            if (!StringUtils.isEmpty(globalResponseMessageBody.getModelRef())) {
+                responseMessageBuilder.responseModel(new ModelRef(globalResponseMessageBody.getModelRef()));
+            }
+            responseMessages.add(responseMessageBuilder.build());
+        }
+
+        return responseMessages;
     }
 }

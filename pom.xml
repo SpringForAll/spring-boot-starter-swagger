@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.spring4all</groupId>
-    <artifactId>spring-boot-starter-swagger</artifactId>
-    <version>1.5.1.RELEASE</version>
+    <artifactId>swagger-spring-boot-starter</artifactId>
+    <version>1.6.0.RELEASE</version>
 
     <name>spring-boot-starter-swagger</name>
     <url>https://github.com/SpringForAll/spring-boot-starter-swagger</url>
@@ -83,6 +83,11 @@
             <artifactId>lombok</artifactId>
             <version>1.16.12</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
