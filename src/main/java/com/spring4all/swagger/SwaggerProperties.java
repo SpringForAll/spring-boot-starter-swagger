@@ -2,6 +2,11 @@ package com.spring4all.swagger;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import springfox.documentation.swagger.web.DocExpansion;
+import springfox.documentation.swagger.web.ModelRendering;
+import springfox.documentation.swagger.web.OperationsSorter;
+import springfox.documentation.swagger.web.TagsSorter;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
@@ -35,7 +40,7 @@ public class SwaggerProperties {
     private String termsOfServiceUrl = "";
 
     /**忽略的参数类型**/
-    private List<Class> ignoredParameterTypes = new ArrayList<>();
+    private List<Class<?>> ignoredParameterTypes = new ArrayList<>();
 
     private Contact contact = new Contact();
 
@@ -116,7 +121,7 @@ public class SwaggerProperties {
         private List<GlobalOperationParameter> globalOperationParameters;
 
         /**忽略的参数类型**/
-        private List<Class> ignoredParameterTypes = new ArrayList<>();
+        private List<Class<?>> ignoredParameterTypes = new ArrayList<>();
 
     }
 
@@ -183,10 +188,7 @@ public class SwaggerProperties {
     @NoArgsConstructor
     public static class UiConfig {
 
-        private String validatorUrl;
-        private String docExpansion = "none";    // none | list
         private String apiSorter = "alpha";       // alpha
-        private String defaultModelRendering = "schema";   // schema
 
         /** 是否启用json编辑器 **/
         private Boolean jsonEditor = false;
@@ -196,6 +198,24 @@ public class SwaggerProperties {
         private String submitMethods = "get,post,put,delete,patch";
         /** 请求超时时间 **/
         private Long requestTimeout = 10000L;
+        
+        private Boolean deepLinking;
+        private Boolean displayOperationId;
+        private Integer defaultModelsExpandDepth;
+        private Integer defaultModelExpandDepth;
+        private ModelRendering defaultModelRendering;
+        private Boolean displayRequestDuration;
+        private DocExpansion docExpansion;
+        private Object filter; // Boolean=false OR String
+        private Integer maxDisplayedTags;
+        private OperationsSorter operationsSorter;
+        private Boolean showExtensions;
+        private TagsSorter tagsSorter;
+
+        /*--------------------------------------------*\
+         * Network
+        \*--------------------------------------------*/
+        private String validatorUrl;
 
     }
 
