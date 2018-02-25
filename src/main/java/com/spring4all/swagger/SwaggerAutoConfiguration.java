@@ -24,6 +24,7 @@ import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.UiConfiguration;
+import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,15 +50,20 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
     @Bean
     public UiConfiguration uiConfiguration(SwaggerProperties swaggerProperties) {
-        return new UiConfiguration(
-                swaggerProperties.getUiConfig().getValidatorUrl(),// url
-                swaggerProperties.getUiConfig().getDocExpansion(),       // docExpansion          => none | list
-                swaggerProperties.getUiConfig().getApiSorter(),      // apiSorter             => alpha
-                swaggerProperties.getUiConfig().getDefaultModelRendering(),     // defaultModelRendering => schema
-                swaggerProperties.getUiConfig().getSubmitMethods().split(","),
-                swaggerProperties.getUiConfig().getJsonEditor(),        // enableJsonEditor      => true | false
-                swaggerProperties.getUiConfig().getShowRequestHeaders(),         // showRequestHeaders    => true | false
-                swaggerProperties.getUiConfig().getRequestTimeout());      // requestTimeout => in milliseconds, defaults to null (uses jquery xh timeout)
+        return UiConfigurationBuilder.builder()
+        		.deepLinking(swaggerProperties.getUiConfig().getDeepLinking())
+        		.defaultModelExpandDepth(swaggerProperties.getUiConfig().getDefaultModelExpandDepth())
+        		.defaultModelRendering(swaggerProperties.getUiConfig().getDefaultModelRendering())
+        		.defaultModelsExpandDepth(swaggerProperties.getUiConfig().getDefaultModelsExpandDepth())
+        		.displayOperationId(swaggerProperties.getUiConfig().getDisplayOperationId())
+        		.displayRequestDuration(swaggerProperties.getUiConfig().getDisplayRequestDuration())
+        		.docExpansion(swaggerProperties.getUiConfig().getDocExpansion())
+        		.maxDisplayedTags(swaggerProperties.getUiConfig().getMaxDisplayedTags())
+        		.operationsSorter(swaggerProperties.getUiConfig().getOperationsSorter())
+        		.showExtensions(swaggerProperties.getUiConfig().getShowExtensions())
+        		.tagsSorter(swaggerProperties.getUiConfig().getTagsSorter())
+        		.validatorUrl(swaggerProperties.getUiConfig().getValidatorUrl())
+        		.build();
     }
 
     @Bean
@@ -87,13 +93,13 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             if (swaggerProperties.getBasePath().isEmpty()) {
                 swaggerProperties.getBasePath().add("/**");
             }
-            List<Predicate<String>> basePath = new ArrayList();
+            List<Predicate<String>> basePath = new ArrayList<Predicate<String>>();
             for (String path : swaggerProperties.getBasePath()) {
                 basePath.add(PathSelectors.ant(path));
             }
 
             // exclude-path处理
-            List<Predicate<String>> excludePath = new ArrayList();
+            List<Predicate<String>> excludePath = new ArrayList<Predicate<String>>();
             for (String path : swaggerProperties.getExcludePath()) {
                 excludePath.add(PathSelectors.ant(path));
             }
@@ -119,8 +125,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     ).build();
 
             /** ignoredParameterTypes **/
-            Class[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
-            Class[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
+            Class<?>[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
+            Class<?>[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
             docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
@@ -153,13 +159,13 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             if (docketInfo.getBasePath().isEmpty()) {
                 docketInfo.getBasePath().add("/**");
             }
-            List<Predicate<String>> basePath = new ArrayList();
+            List<Predicate<String>> basePath = new ArrayList<Predicate<String>>();
             for (String path : docketInfo.getBasePath()) {
                 basePath.add(PathSelectors.ant(path));
             }
 
             // exclude-path处理
-            List<Predicate<String>> excludePath = new ArrayList();
+            List<Predicate<String>> excludePath = new ArrayList<Predicate<String>>();
             for (String path : docketInfo.getExcludePath()) {
                 excludePath.add(PathSelectors.ant(path));
             }
@@ -187,8 +193,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     .build();
 
             /** ignoredParameterTypes **/
-            Class[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
-            Class[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
+            Class<?>[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
+            Class<?>[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
             docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton(groupName, docket);
