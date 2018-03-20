@@ -1,9 +1,8 @@
-package com.didispace.swagger;
+package com.spring4all.swagger;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import springfox.documentation.schema.ModelRef;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -35,6 +34,9 @@ public class SwaggerProperties {
     /**服务条款URL**/
     private String termsOfServiceUrl = "";
 
+    /**忽略的参数类型**/
+    private List<Class> ignoredParameterTypes = new ArrayList<>();
+
     private Contact contact = new Contact();
 
     /**swagger会解析的包路径**/
@@ -53,6 +55,15 @@ public class SwaggerProperties {
 
     /**全局参数配置**/
     private List<GlobalOperationParameter> globalOperationParameters;
+
+    /** 页面功能配置 **/
+    private UiConfig uiConfig = new UiConfig();
+
+    /** 是否使用默认预定义的响应消息 ，默认 true **/
+    private Boolean applyDefaultResponseMessages = true;
+
+    /** 全局响应消息 **/
+    private GlobalResponseMessage globalResponseMessage;
 
 
     @Data
@@ -104,6 +115,9 @@ public class SwaggerProperties {
 
         private List<GlobalOperationParameter> globalOperationParameters;
 
+        /**忽略的参数类型**/
+        private List<Class> ignoredParameterTypes = new ArrayList<>();
+
     }
 
     @Data
@@ -116,6 +130,72 @@ public class SwaggerProperties {
         private String url = "";
         /**联系人email**/
         private String email = "";
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class GlobalResponseMessage {
+
+        /** POST 响应消息体 **/
+        List<GlobalResponseMessageBody> post = new ArrayList<>();
+
+        /** GET 响应消息体 **/
+        List<GlobalResponseMessageBody> get = new ArrayList<>();
+
+        /** PUT 响应消息体 **/
+        List<GlobalResponseMessageBody> put = new ArrayList<>();
+
+        /** PATCH 响应消息体 **/
+        List<GlobalResponseMessageBody> patch = new ArrayList<>();
+
+        /** DELETE 响应消息体 **/
+        List<GlobalResponseMessageBody> delete = new ArrayList<>();
+
+        /** HEAD 响应消息体 **/
+        List<GlobalResponseMessageBody> head = new ArrayList<>();
+
+        /** OPTIONS 响应消息体 **/
+        List<GlobalResponseMessageBody> options = new ArrayList<>();
+
+        /** TRACE 响应消息体 **/
+        List<GlobalResponseMessageBody> trace = new ArrayList<>();
+
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class GlobalResponseMessageBody {
+
+        /** 响应码 **/
+        private int code;
+
+        /** 响应消息 **/
+        private String message;
+
+        /** 响应体 **/
+        private String modelRef;
+
+    }
+
+
+    @Data
+    @NoArgsConstructor
+    public static class UiConfig {
+
+        private String validatorUrl;
+        private String docExpansion = "none";    // none | list
+        private String apiSorter = "alpha";       // alpha
+        private String defaultModelRendering = "schema";   // schema
+
+        /** 是否启用json编辑器 **/
+        private Boolean jsonEditor = false;
+        /** 是否显示请求头信息 **/
+        private Boolean showRequestHeaders = true;
+        /** 支持页面提交的请求类型 **/
+        private String submitMethods = "get,post,put,delete,patch";
+        /** 请求超时时间 **/
+        private Long requestTimeout = 10000L;
 
     }
 
