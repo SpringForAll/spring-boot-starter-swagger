@@ -49,7 +49,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>1.8</version.java>
         <version.swagger>2.8.0</version.swagger>
-        <version.spring-boot>1.5.9.RELEASE</version.spring-boot>
+        <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
         <version.lombok>1.16.18</version.lombok>
     </properties>
 

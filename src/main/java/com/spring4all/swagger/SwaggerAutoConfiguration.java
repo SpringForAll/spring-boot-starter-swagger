@@ -20,7 +20,9 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.ApiKeyVehicle;
 import springfox.documentation.swagger.web.UiConfiguration;
+import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,15 +50,20 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
     @Bean
     public UiConfiguration uiConfiguration(SwaggerProperties swaggerProperties) {
-        return new UiConfiguration(
-                swaggerProperties.getUiConfig().getValidatorUrl(),// url
-                swaggerProperties.getUiConfig().getDocExpansion(),       // docExpansion          => none | list
-                swaggerProperties.getUiConfig().getApiSorter(),      // apiSorter             => alpha
-                swaggerProperties.getUiConfig().getDefaultModelRendering(),     // defaultModelRendering => schema
-                swaggerProperties.getUiConfig().getSubmitMethods().split(","),
-                swaggerProperties.getUiConfig().getJsonEditor(),        // enableJsonEditor      => true | false
-                swaggerProperties.getUiConfig().getShowRequestHeaders(),         // showRequestHeaders    => true | false
-                swaggerProperties.getUiConfig().getRequestTimeout());      // requestTimeout => in milliseconds, defaults to null (uses jquery xh timeout)
+        return UiConfigurationBuilder.builder()
+                .deepLinking(swaggerProperties.getUiConfig().getDeepLinking())
+                .defaultModelExpandDepth(swaggerProperties.getUiConfig().getDefaultModelExpandDepth())
+                .defaultModelRendering(swaggerProperties.getUiConfig().getDefaultModelRendering())
+                .defaultModelsExpandDepth(swaggerProperties.getUiConfig().getDefaultModelsExpandDepth())
+                .displayOperationId(swaggerProperties.getUiConfig().getDisplayOperationId())
+                .displayRequestDuration(swaggerProperties.getUiConfig().getDisplayRequestDuration())
+                .docExpansion(swaggerProperties.getUiConfig().getDocExpansion())
+                .maxDisplayedTags(swaggerProperties.getUiConfig().getMaxDisplayedTags())
+                .operationsSorter(swaggerProperties.getUiConfig().getOperationsSorter())
+                .showExtensions(swaggerProperties.getUiConfig().getShowExtensions())
+                .tagsSorter(swaggerProperties.getUiConfig().getTagsSorter())
+                .validatorUrl(swaggerProperties.getUiConfig().getValidatorUrl())
+                .build();
     }
 
     @Bean
@@ -92,7 +99,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             }
 
             // exclude-path处理
-            List<Predicate<String>> excludePath = new ArrayList();
+            List<Predicate<String>> excludePath = new ArrayList<>();
             for (String path : swaggerProperties.getExcludePath()) {
                 excludePath.add(PathSelectors.ant(path));
             }
@@ -100,8 +107,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .securitySchemes(this.securitySchemes())
-                    .securityContexts(this.securityContexts())
+                    .securitySchemes(Collections.singletonList(apiKey()))
+                    .securityContexts(Collections.singletonList(securityContext()))
                     .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
                             swaggerProperties.getGlobalOperationParameters()));
 
@@ -119,9 +126,9 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                             )
                     ).build();
 
-            /** ignoredParameterTypes **/
-            Class[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
-            Class[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
+            /* ignoredParameterTypes **/
+            Class<?>[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
+            Class<?>[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
             docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
@@ -168,8 +175,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .securitySchemes(this.securitySchemes())
-                    .securityContexts(this.securityContexts())
+                    .securitySchemes(Collections.singletonList(apiKey()))
+                    .securityContexts(Collections.singletonList(securityContext()))
                     .globalOperationParameters(assemblyGlobalOperationParameters(swaggerProperties.getGlobalOperationParameters(),
                             docketInfo.getGlobalOperationParameters()));
 
@@ -189,9 +196,9 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     )
                     .build();
 
-            /** ignoredParameterTypes **/
-            Class[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
-            Class[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
+            /* ignoredParameterTypes **/
+            Class<?>[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
+            Class<?>[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
             docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton(groupName, docket);
@@ -201,36 +208,41 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     }
 
     /**
-     * 配置 Authorization ApiKey
+     * 配置基于 ApiKey 的鉴权对象
      *
      * @return
      */
-    private List<ApiKey> securitySchemes() {
-        return newArrayList(
-                new ApiKey(swaggerProperties().getAuthorization().getName(),
-                        swaggerProperties().getAuthorization().getKeyName(), "header"));
+    private ApiKey apiKey() {
+        return new ApiKey(swaggerProperties().getAuthorization().getName(),
+                swaggerProperties().getAuthorization().getKeyName(),
+                ApiKeyVehicle.HEADER.getValue());
     }
 
     /**
-     * 通过正则设置需要传递 Authorization 信息的API接口
+     * 配置默认的全局鉴权策略的开关，以及通过正则表达式进行匹配；默认 ^.*$ 匹配所有URL
+     * 其中 securityReferences 为配置启用的鉴权策略
      *
      * @return
      */
-    private List<SecurityContext> securityContexts() {
-        return newArrayList(
-                SecurityContext.builder()
-                        .securityReferences(defaultAuth())
-                        .forPaths(PathSelectors.regex(swaggerProperties().getAuthorization().getAuthRegex()))
-                        .build()
-        );
+    private SecurityContext securityContext() {
+        return SecurityContext.builder()
+                .securityReferences(defaultAuth())
+                .forPaths(PathSelectors.regex(swaggerProperties().getAuthorization().getAuthRegex()))
+                .build();
     }
 
-    List<SecurityReference> defaultAuth() {
+    /**
+     * 配置默认的全局鉴权策略；其中返回的 SecurityReference 中，reference 即为ApiKey对象里面的name，保持一致才能开启全局鉴权
+     *
+     * @return
+     */
+    private List<SecurityReference> defaultAuth() {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return newArrayList(
-                new SecurityReference("BearerToken", authorizationScopes));
+        return Collections.singletonList(SecurityReference.builder()
+                .reference(swaggerProperties().getAuthorization().getName())
+                .scopes(authorizationScopes).build());
     }
 
 
@@ -295,15 +307,15 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     /**
      * 设置全局响应消息
      *
-     * @param swaggerProperties 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE
-     * @param docketForBuilder
+     * @param swaggerProperties swaggerProperties 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE
+     * @param docketForBuilder  swagger docket builder
      */
     private void buildGlobalResponseMessage(SwaggerProperties swaggerProperties, Docket docketForBuilder) {
 
         SwaggerProperties.GlobalResponseMessage globalResponseMessages =
                 swaggerProperties.getGlobalResponseMessage();
 
-        // POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 响应消息体
+        /* POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 响应消息体 **/
         List<ResponseMessage> postResponseMessages = getResponseMessageList(globalResponseMessages.getPost());
         List<ResponseMessage> getResponseMessages = getResponseMessageList(globalResponseMessages.getGet());
         List<ResponseMessage> putResponseMessages = getResponseMessageList(globalResponseMessages.getPut());
@@ -327,10 +339,11 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     /**
      * 获取返回消息体列表
      *
-     * @param globalResponseMessageBodyList
+     * @param globalResponseMessageBodyList 全局Code消息返回集合
      * @return
      */
-    private List<ResponseMessage> getResponseMessageList(List<SwaggerProperties.GlobalResponseMessageBody> globalResponseMessageBodyList) {
+    private List<ResponseMessage> getResponseMessageList
+    (List<SwaggerProperties.GlobalResponseMessageBody> globalResponseMessageBodyList) {
         List<ResponseMessage> responseMessages = new ArrayList<>();
         for (SwaggerProperties.GlobalResponseMessageBody globalResponseMessageBody : globalResponseMessageBodyList) {
             ResponseMessageBuilder responseMessageBuilder = new ResponseMessageBuilder();
