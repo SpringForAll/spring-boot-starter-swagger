@@ -340,17 +340,17 @@ public class SwaggerProperties {
     static class Authorization {
 
         /**
-         * 鉴权 API-KEY 名称标识
+         * 鉴权策略ID，对应 SecurityReferences ID
          */
         private String name = "Authorization";
 
         /**
-         * 鉴权参数
+         * 鉴权传递的Header参数
          */
         private String keyName = "TOKEN";
 
         /**
-         * 通过正则设置需要传递Authorization信息的API接口
+         * 需要开启鉴权URL的正则
          */
         private String authRegex = "^.*$";
     }

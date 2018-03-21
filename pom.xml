@@ -6,7 +6,7 @@
 
     <groupId>com.spring4all</groupId>
     <artifactId>swagger-spring-boot-starter</artifactId>
-    <version>1.6.1.RELEASE</version>
+    <version>1.7.0.RELEASE</version>
 
     <name>spring-boot-starter-swagger</name>
     <url>https://github.com/SpringForAll/spring-boot-starter-swagger</url>
