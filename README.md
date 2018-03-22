@@ -1,7 +1,5 @@
 # 简介
 
-[![Build Status](https://travis-ci.org/dyc87112/spring-boot-starter-swagger.svg?branch=1.5.0)](https://travis-ci.org/dyc87112/spring-boot-starter-swagger)
-
 该项目主要利用Spring Boot的自动化配置特性来实现快速的将swagger2引入spring boot应用来生成API文档，简化原生使用swagger2的整合代码。
 
 - 源码地址
@@ -16,7 +14,7 @@
 # 版本基础
 
 - Spring Boot：1.5.x
-- Swagger：2.7.x
+- Swagger：2.8.x
 
 # 如何使用
 
@@ -24,11 +22,13 @@
 
 - 在`pom.xml`中引入依赖：
 
+> 当前最新版本 1.7.0.RELEASE
+
 ```xml
 <dependency>
 	<groupId>com.spring4all</groupId>
 	<artifactId>swagger-spring-boot-starter</artifactId>
-	<version>1.6.0.RELEASE</version>
+	<version>1.7.0.RELEASE</version>
 </dependency>
 ```
 
@@ -254,8 +254,10 @@ swagger.ui-config.submit-methods=
 ```properties
 # json编辑器
 swagger.ui-config.json-editor=false
+
 # 显示请求头
 swagger.ui-config.show-request-headers=true
+
 # 页面调试请求的超时时间
 swagger.ui-config.request-timeout=5000
 ```
@@ -276,8 +278,81 @@ swagger.docket.aaa.ignored-parameter-types[1]=com.didispace.demo.Product
 > Q. Infinite loop when springfox tries to determine schema for objects with nested/complex constraints?
 > A. If you have recursively defined objects, I would try and see if providing an alternate type might work or perhaps even ignoring the offending classes e.g. order using the docket. ignoredParameterTypes(Order.class). This is usually found in Hibernate domain objects that have bidirectional dependencies on other objects.
 
+### Authorization 鉴权配置 (1.7.0 + 支持)
+
+- 新增 Authorization 配置项
+
+```properties
+# 鉴权策略ID，对应 SecurityReferences ID
+swagger.authorization.name=Authorization
+
+# 鉴权传递的Header参数
+swagger.authorization.key-name=token
+
+# 需要开启鉴权URL的正则, 默认^.*$匹配所有URL
+swagger.authorization.auth-regex=^.*$
+```
+
+备注：目前支持`ApiKey`鉴权模式，后续添加`Oauth2`和`BasicAuth`支持
+
+**使用须知**
+
+> 1. 默认已经在全局开启了`global`的SecurityReferences，无需配置任何参数就可以使用；
+> 2. 全局鉴权的范围在可以通过以上参数`auth-regex`进行正则表达式匹配控制；
+> 3. 除了全局开启外，还可以手动通过注解在RestController上进行定义鉴权，使用方式如下：
+
+```java
+// 其中的ID Authorization 即为配置项 swagger.authorization.name，详细请关注后面的配置代码
+@ApiOperation(value = "Hello World", authorizations = {@Authorization(value = "Authorization")})
+@RequestMapping(value = "/hello", method = RequestMethod.GET)
+String hello();
+```
+
+**关于如何配置实现鉴权，请关注以下code：**
+
+```java
+/**
+ * 配置基于 ApiKey 的鉴权对象
+ *
+ * @return
+ */
+private ApiKey apiKey() {
+    return new ApiKey(swaggerProperties().getAuthorization().getName(),
+            swaggerProperties().getAuthorization().getKeyName(),
+            ApiKeyVehicle.HEADER.getValue());
+}
+
+/**
+ * 配置默认的全局鉴权策略的开关，以及通过正则表达式进行匹配；默认 ^.*$ 匹配所有URL
+ * 其中 securityReferences 为配置启用的鉴权策略
+ *
+ * @return
+ */
+private SecurityContext securityContext() {
+    return SecurityContext.builder()
+            .securityReferences(defaultAuth())
+            .forPaths(PathSelectors.regex(swaggerProperties().getAuthorization().getAuthRegex()))
+            .build();
+}
+
+/**
+ * 配置默认的全局鉴权策略；其中返回的 SecurityReference 中，reference 即为ApiKey对象里面的name，保持一致才能开启全局鉴权
+ *
+ * @return
+ */
+private List<SecurityReference> defaultAuth() {
+    AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+    AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+    authorizationScopes[0] = authorizationScope;
+    return Collections.singletonList(SecurityReference.builder()
+            .reference(swaggerProperties().getAuthorization().getName())
+            .scopes(authorizationScopes).build());
+}
+```
+
 ## 贡献者
 
 - [程序猿DD-翟永超](https://github.com/dyc87112/)
 - [小火](https://renlulu.github.io/)
 - [泥瓦匠BYSocket](https://github.com/JeffLi1993)
+- [LarryKoo-古拉里](https://github.com/gumutianqi)
