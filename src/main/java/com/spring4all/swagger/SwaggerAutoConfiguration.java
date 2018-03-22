@@ -2,7 +2,6 @@ package com.spring4all.swagger;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Lists;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -17,16 +16,18 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.Parameter;
-import springfox.documentation.service.ResponseMessage;
+import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.ApiKeyVehicle;
 import springfox.documentation.swagger.web.UiConfiguration;
+import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * @author 翟永超
@@ -49,15 +50,20 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
     @Bean
     public UiConfiguration uiConfiguration(SwaggerProperties swaggerProperties) {
-        return new UiConfiguration(
-                swaggerProperties.getUiConfig().getValidatorUrl(),// url
-                swaggerProperties.getUiConfig().getDocExpansion(),       // docExpansion          => none | list
-                swaggerProperties.getUiConfig().getApiSorter(),      // apiSorter             => alpha
-                swaggerProperties.getUiConfig().getDefaultModelRendering(),     // defaultModelRendering => schema
-                swaggerProperties.getUiConfig().getSubmitMethods().split(","),
-                swaggerProperties.getUiConfig().getJsonEditor(),        // enableJsonEditor      => true | false
-                swaggerProperties.getUiConfig().getShowRequestHeaders(),         // showRequestHeaders    => true | false
-                swaggerProperties.getUiConfig().getRequestTimeout());      // requestTimeout => in milliseconds, defaults to null (uses jquery xh timeout)
+        return UiConfigurationBuilder.builder()
+                .deepLinking(swaggerProperties.getUiConfig().getDeepLinking())
+                .defaultModelExpandDepth(swaggerProperties.getUiConfig().getDefaultModelExpandDepth())
+                .defaultModelRendering(swaggerProperties.getUiConfig().getDefaultModelRendering())
+                .defaultModelsExpandDepth(swaggerProperties.getUiConfig().getDefaultModelsExpandDepth())
+                .displayOperationId(swaggerProperties.getUiConfig().getDisplayOperationId())
+                .displayRequestDuration(swaggerProperties.getUiConfig().getDisplayRequestDuration())
+                .docExpansion(swaggerProperties.getUiConfig().getDocExpansion())
+                .maxDisplayedTags(swaggerProperties.getUiConfig().getMaxDisplayedTags())
+                .operationsSorter(swaggerProperties.getUiConfig().getOperationsSorter())
+                .showExtensions(swaggerProperties.getUiConfig().getShowExtensions())
+                .tagsSorter(swaggerProperties.getUiConfig().getTagsSorter())
+                .validatorUrl(swaggerProperties.getUiConfig().getValidatorUrl())
+                .build();
     }
 
     @Bean
@@ -93,7 +99,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             }
 
             // exclude-path处理
-            List<Predicate<String>> excludePath = new ArrayList();
+            List<Predicate<String>> excludePath = new ArrayList<>();
             for (String path : swaggerProperties.getExcludePath()) {
                 excludePath.add(PathSelectors.ant(path));
             }
@@ -101,6 +107,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
+                    .securitySchemes(Collections.singletonList(apiKey()))
+                    .securityContexts(Collections.singletonList(securityContext()))
                     .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
                             swaggerProperties.getGlobalOperationParameters()));
 
@@ -118,9 +126,9 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                             )
                     ).build();
 
-            /** ignoredParameterTypes **/
-            Class[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
-            Class[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
+            /* ignoredParameterTypes **/
+            Class<?>[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
+            Class<?>[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
             docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton("defaultDocket", docket);
@@ -167,6 +175,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
+                    .securitySchemes(Collections.singletonList(apiKey()))
+                    .securityContexts(Collections.singletonList(securityContext()))
                     .globalOperationParameters(assemblyGlobalOperationParameters(swaggerProperties.getGlobalOperationParameters(),
                             docketInfo.getGlobalOperationParameters()));
 
@@ -186,15 +196,53 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     )
                     .build();
 
-            /** ignoredParameterTypes **/
-            Class[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
-            Class[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
+            /* ignoredParameterTypes **/
+            Class<?>[] array = new Class[docketInfo.getIgnoredParameterTypes().size()];
+            Class<?>[] ignoredParameterTypes = docketInfo.getIgnoredParameterTypes().toArray(array);
             docket.ignoredParameterTypes(ignoredParameterTypes);
 
             configurableBeanFactory.registerSingleton(groupName, docket);
             docketList.add(docket);
         }
         return docketList;
+    }
+
+    /**
+     * 配置基于 ApiKey 的鉴权对象
+     *
+     * @return
+     */
+    private ApiKey apiKey() {
+        return new ApiKey(swaggerProperties().getAuthorization().getName(),
+                swaggerProperties().getAuthorization().getKeyName(),
+                ApiKeyVehicle.HEADER.getValue());
+    }
+
+    /**
+     * 配置默认的全局鉴权策略的开关，以及通过正则表达式进行匹配；默认 ^.*$ 匹配所有URL
+     * 其中 securityReferences 为配置启用的鉴权策略
+     *
+     * @return
+     */
+    private SecurityContext securityContext() {
+        return SecurityContext.builder()
+                .securityReferences(defaultAuth())
+                .forPaths(PathSelectors.regex(swaggerProperties().getAuthorization().getAuthRegex()))
+                .build();
+    }
+
+    /**
+     * 配置默认的全局鉴权策略；其中返回的 SecurityReference 中，reference 即为ApiKey对象里面的name，保持一致才能开启全局鉴权
+     *
+     * @return
+     */
+    private List<SecurityReference> defaultAuth() {
+        AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
+        authorizationScopes[0] = authorizationScope;
+        return Collections.singletonList(SecurityReference.builder()
+                .reference(swaggerProperties().getAuthorization().getName())
+                .scopes(authorizationScopes).build());
     }
 
 
@@ -206,7 +254,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
 
     private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(
             List<SwaggerProperties.GlobalOperationParameter> globalOperationParameters) {
-        List<Parameter> parameters = Lists.newArrayList();
+        List<Parameter> parameters = newArrayList();
 
         if (Objects.isNull(globalOperationParameters)) {
             return parameters;
@@ -242,7 +290,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 .map(SwaggerProperties.GlobalOperationParameter::getName)
                 .collect(Collectors.toSet());
 
-        List<SwaggerProperties.GlobalOperationParameter> resultOperationParameters = Lists.newArrayList();
+        List<SwaggerProperties.GlobalOperationParameter> resultOperationParameters = newArrayList();
 
         if (Objects.nonNull(globalOperationParameters)) {
             for (SwaggerProperties.GlobalOperationParameter parameter : globalOperationParameters) {
@@ -259,42 +307,43 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     /**
      * 设置全局响应消息
      *
-     * @param swaggerProperties 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE
-     * @param docketForBuilder
+     * @param swaggerProperties swaggerProperties 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE
+     * @param docketForBuilder  swagger docket builder
      */
     private void buildGlobalResponseMessage(SwaggerProperties swaggerProperties, Docket docketForBuilder) {
 
         SwaggerProperties.GlobalResponseMessage globalResponseMessages =
                 swaggerProperties.getGlobalResponseMessage();
 
-        // POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 响应消息体
-        List<ResponseMessage> postResponseMessages      = getResponseMessageList(globalResponseMessages.getPost());
-        List<ResponseMessage> getResponseMessages       = getResponseMessageList(globalResponseMessages.getGet());
-        List<ResponseMessage> putResponseMessages       = getResponseMessageList(globalResponseMessages.getPut());
-        List<ResponseMessage> patchResponseMessages     = getResponseMessageList(globalResponseMessages.getPatch());
-        List<ResponseMessage> deleteResponseMessages    = getResponseMessageList(globalResponseMessages.getDelete());
-        List<ResponseMessage> headResponseMessages      = getResponseMessageList(globalResponseMessages.getHead());
-        List<ResponseMessage> optionsResponseMessages   = getResponseMessageList(globalResponseMessages.getOptions());
-        List<ResponseMessage> trackResponseMessages     = getResponseMessageList(globalResponseMessages.getTrace());
+        /* POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 响应消息体 **/
+        List<ResponseMessage> postResponseMessages = getResponseMessageList(globalResponseMessages.getPost());
+        List<ResponseMessage> getResponseMessages = getResponseMessageList(globalResponseMessages.getGet());
+        List<ResponseMessage> putResponseMessages = getResponseMessageList(globalResponseMessages.getPut());
+        List<ResponseMessage> patchResponseMessages = getResponseMessageList(globalResponseMessages.getPatch());
+        List<ResponseMessage> deleteResponseMessages = getResponseMessageList(globalResponseMessages.getDelete());
+        List<ResponseMessage> headResponseMessages = getResponseMessageList(globalResponseMessages.getHead());
+        List<ResponseMessage> optionsResponseMessages = getResponseMessageList(globalResponseMessages.getOptions());
+        List<ResponseMessage> trackResponseMessages = getResponseMessageList(globalResponseMessages.getTrace());
 
         docketForBuilder.useDefaultResponseMessages(swaggerProperties.getApplyDefaultResponseMessages())
-                .globalResponseMessage(RequestMethod.POST,      postResponseMessages)
-                .globalResponseMessage(RequestMethod.GET,       getResponseMessages)
-                .globalResponseMessage(RequestMethod.PUT,       putResponseMessages)
-                .globalResponseMessage(RequestMethod.PATCH,     patchResponseMessages)
-                .globalResponseMessage(RequestMethod.DELETE,    deleteResponseMessages)
-                .globalResponseMessage(RequestMethod.HEAD,      headResponseMessages)
-                .globalResponseMessage(RequestMethod.OPTIONS,   optionsResponseMessages)
-                .globalResponseMessage(RequestMethod.TRACE,     trackResponseMessages);
+                .globalResponseMessage(RequestMethod.POST, postResponseMessages)
+                .globalResponseMessage(RequestMethod.GET, getResponseMessages)
+                .globalResponseMessage(RequestMethod.PUT, putResponseMessages)
+                .globalResponseMessage(RequestMethod.PATCH, patchResponseMessages)
+                .globalResponseMessage(RequestMethod.DELETE, deleteResponseMessages)
+                .globalResponseMessage(RequestMethod.HEAD, headResponseMessages)
+                .globalResponseMessage(RequestMethod.OPTIONS, optionsResponseMessages)
+                .globalResponseMessage(RequestMethod.TRACE, trackResponseMessages);
     }
 
     /**
      * 获取返回消息体列表
      *
-     * @param globalResponseMessageBodyList
+     * @param globalResponseMessageBodyList 全局Code消息返回集合
      * @return
      */
-    private List<ResponseMessage> getResponseMessageList(List<SwaggerProperties.GlobalResponseMessageBody> globalResponseMessageBodyList) {
+    private List<ResponseMessage> getResponseMessageList
+    (List<SwaggerProperties.GlobalResponseMessageBody> globalResponseMessageBodyList) {
         List<ResponseMessage> responseMessages = new ArrayList<>();
         for (SwaggerProperties.GlobalResponseMessageBody globalResponseMessageBody : globalResponseMessageBodyList) {
             ResponseMessageBuilder responseMessageBuilder = new ResponseMessageBuilder();
