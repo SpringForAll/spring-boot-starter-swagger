@@ -131,7 +131,7 @@ swagger.exclude-path=/ops/**, /error
 
 ### 分组配置
 
-当我们一个项目的API非常多的时候，我们希望对API文档实现分组。从1.2.0.RELEASE开始，将支持分组配置功能。
+当我们一个项目的API非常多的时候，我们希望对API文档实现分组。
 
 ![分组功能](https://github.com/Jero-framework/swagger-jero-spring-boot-starter/blob/master/images/swagger-group.png)
 
