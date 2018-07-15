@@ -1,4 +1,4 @@
-package com.spring4all.swagger;
+package com.lxt.stater.swagger;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -29,11 +29,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-/**
- * @author 翟永超
- * Create date：2017/8/7.
- * My blog： http://blog.didispace.com
- */
 @Configuration
 @Import({
         Swagger2Configuration.class

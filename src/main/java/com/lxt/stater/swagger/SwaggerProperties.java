@@ -1,4 +1,4 @@
-package com.spring4all.swagger;
+package com.lxt.stater.swagger;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author 翟永超
- * Create date ：2017/8/7.
- * My blog： http://blog.didispace.com
- */
 @Data
 @ConfigurationProperties("swagger")
 public class SwaggerProperties {

@@ -2,42 +2,31 @@
 
 该项目主要利用Spring Boot的自动化配置特性来实现快速的将swagger2引入spring boot应用来生成API文档，简化原生使用swagger2的整合代码。
 
-- 源码地址
-  - GitHub：https://github.com/dyc87112/spring-boot-starter-swagger
-  - 码云：https://gitee.com/didispace/spring-boot-starter-swagger
-- 使用样例：https://github.com/dyc87112/swagger-starter-demo
-- 我的博客：http://blog.didispace.com
-- 我们社区：http://www.spring4all.com
-
-**小工具一枚，欢迎使用和Star支持，如使用过程中碰到问题，可以提出Issue，我会尽力完善该Starter**
 
 # 版本基础
 
-- Spring Boot：1.5.x
-- Swagger：2.9.x
+- Spring Boot：2.0.3
+- Swagger：2.9.2
 
 # 如何使用
 
 在该项目的帮助下，我们的Spring Boot可以轻松的引入swagger2，主需要做下面两个步骤：
 
 - 在`pom.xml`中引入依赖：
-
-> 当前最新版本 1.7.1.RELEASE
-
 ```xml
 <dependency>
-	<groupId>com.spring4all</groupId>
-	<artifactId>swagger-spring-boot-starter</artifactId>
-	<version>1.7.1.RELEASE</version>
+    <groupId>com.jero</groupId>
+    <artifactId>swagger-jero-spring-boot-starter</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```
 
-**注意：从`1.6.0`开始，我们按Spring Boot官方建议修改了artifactId为`swagger-spring-boot-starter`，1.6.0之前的版本不做修改，依然为使用`spring-boot-starter-swagger` !**
+> 当前最新版本 1.0.0
 
-- 在应用主类中增加`@EnableSwagger2Doc`注解
+- 在应用主类中增加`@EnableJeroSwagger`注解
 
 ```java
-@EnableSwagger2Doc
+@EnableJeroSwagger
 @SpringBootApplication
 public class Bootstrap {
 
@@ -59,16 +48,16 @@ public class Bootstrap {
 ```properties
 swagger.enabled=true
 
-swagger.title=spring-boot-starter-swagger
-swagger.description=Starter for swagger 2.x
-swagger.version=1.4.0.RELEASE
+swagger.title=Jero-swagger文档
+swagger.description=Jero Starter for swagger 2.x
+swagger.version=1.0.0.
 swagger.license=Apache License, Version 2.0
 swagger.licenseUrl=https://www.apache.org/licenses/LICENSE-2.0.html
-swagger.termsOfServiceUrl=https://github.com/dyc87112/spring-boot-starter-swagger
-swagger.contact.name=didi
-swagger.contact.url=http://blog.didispace.com
-swagger.contact.email=dyc87112@qq.com
-swagger.base-package=com.didispace
+swagger.termsOfServiceUrl=https://github.com/Jero-framework/swagger-jero-spring-boot-starter
+swagger.contact.name=lixuetao
+swagger.contact.url=http://www.cnblogs.com/zer0Black/
+swagger.contact.email=lxtalx@gmail.com
+swagger.base-package=com.lxt
 swagger.base-path=/**
 swagger.exclude-path=/error, /ops/**
 
@@ -121,13 +110,6 @@ swagger.global-response-message.post[0].modelRef=ERROR
 - swagger.globalOperationParameters[0].required=指定参数是否必传，true,false
 ```
 
-
-> `1.3.0.RELEASE`新增：`swagger.host`属性，同时也支持指定docket的配置
->
-> `1.4.0.RELEASE`新增：
-> - `swagger.enabled`：用于开关swagger的配置
-> - `swagger.globalOperationParameters`：用于设置全局的参数，比如：header部分的accessToken等。该参数支持指定docket的配置。
-
 ### Path规则说明
 
 `swagger.base-path`和`swagger.exclude-path`使用ANT规则配置。
@@ -151,7 +133,7 @@ swagger.exclude-path=/ops/**, /error
 
 当我们一个项目的API非常多的时候，我们希望对API文档实现分组。从1.2.0.RELEASE开始，将支持分组配置功能。
 
-![分组功能](https://github.com/dyc87112/spring-boot-starter-swagger/blob/master/images/swagger-group.png)
+![分组功能](https://github.com/Jero-framework/swagger-jero-spring-boot-starter/tree/master/images/swagger-group.png)
 
 具体配置内容如下：
 
@@ -186,11 +168,11 @@ swagger.exclude-path=/ops/**, /error
 ```properties
 swagger.docket.aaa.title=group-a
 swagger.docket.aaa.description=Starter for swagger 2.x
-swagger.docket.aaa.version=1.3.0.RELEASE
+swagger.docket.aaa.version=1.0.0.RELEASE
 swagger.docket.aaa.termsOfServiceUrl=https://gitee.com/didispace/spring-boot-starter-swagger
-swagger.docket.aaa.contact.name=zhaiyongchao
-swagger.docket.aaa.contact.url=http://spring4all.com/
-swagger.docket.aaa.contact.email=didi@potatomato.club
+swagger.docket.aaa.contact.name=lixuetao
+swagger.docket.aaa.contact.url=http://www.cnblogs.com/zer0Black/
+swagger.docket.aaa.contact.email=lxtalx@gmail.com
 swagger.docket.aaa.excludePath=/ops/**
 swagger.docket.aaa.globalOperationParameters[0].name=name three
 swagger.docket.aaa.globalOperationParameters[0].description=some description three override
@@ -198,16 +180,16 @@ swagger.docket.aaa.globalOperationParameters[0].modelRef=string
 swagger.docket.aaa.globalOperationParameters[0].parameterType=header
 
 swagger.docket.bbb.title=group-bbb
-swagger.docket.bbb.basePackage=com.yonghui
+swagger.docket.bbb.basePackage=com.lxt
 ```
 
 说明：默认配置与分组配置可以一起使用。在分组配置中没有配置的内容将使用默认配置替代，所以默认配置可以作为分组配置公共部分属性的配置。`swagger.docket.aaa.globalOperationParameters[0].name`会覆盖同名的全局配置。
 
-### JSR-303校验注解支持（1.5.0 + 支持）
+### JSR-303校验注解支持
 
 支持对JSR-303校验注解的展示，如下图所示：
 
-![JSR-303校验展示](https://github.com/dyc87112/spring-boot-starter-swagger/blob/master/images/jsr-303.png)
+![JSR-303校验展示](https://github.com/Jero-framework/swagger-jero-spring-boot-starter/tree/master/images/jsr-303.png)
 
 目前共支持以下几个注解：
 
@@ -216,7 +198,7 @@ swagger.docket.bbb.basePackage=com.yonghui
 - `@Size`
 - `@Pattern`
 
-### 自定义全局响应消息配置（1.6.0 + 支持）
+### 自定义全局响应消息配置
 
 支持 POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 全局响应消息配置，配置如下
 
@@ -233,7 +215,7 @@ swagger.global-response-message.post[0].message=500post
 swagger.global-response-message.post[0].modelRef=ERROR
 ```
 
-### UI功能配置（1.6.0 + 支持）
+### UI功能配置
 
 - 调试按钮的控制(try it out)
 
@@ -262,7 +244,7 @@ swagger.ui-config.show-request-headers=true
 swagger.ui-config.request-timeout=5000
 ```
 
-### ignoredParameterTypes配置（1.6.0 + 支持）
+### ignoredParameterTypes配置
 
 ```properties
 # 基础配置
@@ -278,7 +260,7 @@ swagger.docket.aaa.ignored-parameter-types[1]=com.didispace.demo.Product
 > Q. Infinite loop when springfox tries to determine schema for objects with nested/complex constraints?
 > A. If you have recursively defined objects, I would try and see if providing an alternate type might work or perhaps even ignoring the offending classes e.g. order using the docket. ignoredParameterTypes(Order.class). This is usually found in Hibernate domain objects that have bidirectional dependencies on other objects.
 
-### Authorization 鉴权配置 (1.7.0 + 支持)
+### Authorization 鉴权配置
 
 - 新增 Authorization 配置项
 
@@ -349,10 +331,3 @@ private List<SecurityReference> defaultAuth() {
             .scopes(authorizationScopes).build());
 }
 ```
-
-## 贡献者
-
-- [程序猿DD-翟永超](https://github.com/dyc87112/)
-- [小火](https://renlulu.github.io/)
-- [泥瓦匠BYSocket](https://github.com/JeffLi1993)
-- [LarryKoo-古拉里](https://github.com/gumutianqi)
