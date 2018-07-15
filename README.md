@@ -133,7 +133,7 @@ swagger.exclude-path=/ops/**, /error
 
 当我们一个项目的API非常多的时候，我们希望对API文档实现分组。从1.2.0.RELEASE开始，将支持分组配置功能。
 
-![分组功能](https://github.com/Jero-framework/swagger-jero-spring-boot-starter/tree/master/images/swagger-group.png)
+![分组功能](https://github.com/Jero-framework/swagger-jero-spring-boot-starter/blob/master/images/swagger-group.png
 
 具体配置内容如下：
 
@@ -189,7 +189,7 @@ swagger.docket.bbb.basePackage=com.lxt
 
 支持对JSR-303校验注解的展示，如下图所示：
 
-![JSR-303校验展示](https://github.com/Jero-framework/swagger-jero-spring-boot-starter/tree/master/images/jsr-303.png)
+![JSR-303校验展示](https://github.com/Jero-framework/swagger-jero-spring-boot-starter/blob/master/images/jsr-303.png)
 
 目前共支持以下几个注解：
 
