@@ -37,11 +37,11 @@ public class SwaggerProperties {
     /**
      * 许可证
      **/
-    private String license = "";
+    private String license = "Apache License 2.0";
     /**
      * 许可证URL
      **/
-    private String licenseUrl = "";
+    private String licenseUrl = "https://github.com/Jero-framework/swagger-jero-spring-boot-starter/blob/master/LICENSE";
     /**
      * 服务条款URL
      **/
