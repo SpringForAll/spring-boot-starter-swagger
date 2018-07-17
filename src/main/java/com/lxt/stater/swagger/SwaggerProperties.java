@@ -25,15 +25,15 @@ public class SwaggerProperties {
     /**
      * 标题
      **/
-    private String title = "";
+    private String title = "Jero-swagger文档";
     /**
      * 描述
      **/
-    private String description = "";
+    private String description = "涵盖了该框架中所有的接口";
     /**
      * 版本
      **/
-    private String version = "";
+    private String version = "1.0.0";
     /**
      * 许可证
      **/
