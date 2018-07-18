@@ -1,4 +1,4 @@
-package com.sidao.swagger;
+package org.sidao.swagger;
 
 import org.springframework.context.annotation.Import;
 

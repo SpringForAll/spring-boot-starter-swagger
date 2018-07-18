@@ -1,4 +1,4 @@
-package com.sidao.swagger;
+package org.sidao.swagger;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
