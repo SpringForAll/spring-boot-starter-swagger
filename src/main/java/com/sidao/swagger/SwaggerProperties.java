@@ -1,4 +1,4 @@
-package com.spring4all.swagger;
+package com.sidao.swagger;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

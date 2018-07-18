@@ -29,6 +29,7 @@
     <scm>
         <connection>git@github.com:wxcmyx/spring-boot-starter-swagger.git</connection>
         <developerConnection>https://github.com/wxcmyx/spring-boot-starter-swagger</developerConnection>
+        <url>git@github.com:wxcmyx/spring-boot-starter-swagger.git</url>
     </scm>
 
     <developers>
