@@ -18,7 +18,7 @@
 
 ```xml
 <dependency>
-	<groupId>com.github.wxcmyx</groupId>
+	<groupId>org.sidao</groupId>
 	<artifactId>swagger2-spring-boot-starter</artifactId>
 	<version>2.0.0.RELEASE</version>
 </dependency>
