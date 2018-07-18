@@ -2,18 +2,10 @@
 
 该项目主要利用Spring Boot的自动化配置特性来实现快速的将swagger2引入spring boot应用来生成API文档，简化原生使用swagger2的整合代码。
 
-- 源码地址
-  - GitHub：https://github.com/dyc87112/spring-boot-starter-swagger
-  - 码云：https://gitee.com/didispace/spring-boot-starter-swagger
-- 使用样例：https://github.com/dyc87112/swagger-starter-demo
-- 我的博客：http://blog.didispace.com
-- 我们社区：http://www.spring4all.com
-
-**小工具一枚，欢迎使用和Star支持，如使用过程中碰到问题，可以提出Issue，我会尽力完善该Starter**
 
 # 版本基础
 
-- Spring Boot：1.5.x
+- Spring Boot：2.0.x
 - Swagger：2.8.x
 
 # 如何使用
@@ -22,17 +14,16 @@
 
 - 在`pom.xml`中引入依赖：
 
-> 当前最新版本 1.7.0.RELEASE
+> 当前最新版本 2.0.0.RELEASE
 
 ```xml
 <dependency>
-	<groupId>com.spring4all</groupId>
-	<artifactId>swagger-spring-boot-starter</artifactId>
-	<version>1.7.0.RELEASE</version>
+	<groupId>com.github.wxcmyx</groupId>
+	<artifactId>swagger2-spring-boot-starter</artifactId>
+	<version>2.0.0.RELEASE</version>
 </dependency>
 ```
 
-**注意：从`1.6.0`开始，我们按Spring Boot官方建议修改了artifactId为`swagger-spring-boot-starter`，1.6.0之前的版本不做修改，依然为使用`spring-boot-starter-swagger` !**
 
 - 在应用主类中增加`@EnableSwagger2Doc`注解
 
@@ -127,6 +118,9 @@ swagger.global-response-message.post[0].modelRef=ERROR
 > `1.4.0.RELEASE`新增：
 > - `swagger.enabled`：用于开关swagger的配置
 > - `swagger.globalOperationParameters`：用于设置全局的参数，比如：header部分的accessToken等。该参数支持指定docket的配置。
+>
+> `2.0.0.RELEASE`修改：
+> - `swagger.enabled`：配置FALSE时的问题
 
 ### Path规则说明
 
@@ -356,3 +350,4 @@ private List<SecurityReference> defaultAuth() {
 - [小火](https://renlulu.github.io/)
 - [泥瓦匠BYSocket](https://github.com/JeffLi1993)
 - [LarryKoo-古拉里](https://github.com/gumutianqi)
+- [心有片海](https://github.com/wxcmyx)

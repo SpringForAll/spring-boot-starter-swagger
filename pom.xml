@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.spring4all</groupId>
-    <artifactId>swagger-spring-boot-starter</artifactId>
-    <version>1.7.0.RELEASE</version>
+    <groupId>org.sidao</groupId>
+    <artifactId>swagger2-spring-boot-starter</artifactId>
+    <version>2.0.0.RELEASE</version>
 
-    <name>spring-boot-starter-swagger</name>
-    <url>https://github.com/SpringForAll/spring-boot-starter-swagger</url>
+    <name>spring-boot-starter-swagger2</name>
+    <url>https://github.com/wxcmyx/spring-boot-starter-swagger</url>
     <description>starter for swagger2</description>
 
     <parent>
@@ -27,12 +27,16 @@
     </licenses>
 
     <scm>
-        <url>http://spring4all.com</url>
-        <connection>git@github.com:SpringForAll/spring-boot-starter-swagger.git</connection>
-        <developerConnection>https://github.com/SpringForAll/spring-boot-starter-swagger</developerConnection>
+        <connection>git@github.com:wxcmyx/spring-boot-starter-swagger.git</connection>
+        <developerConnection>https://github.com/wxcmyx/spring-boot-starter-swagger</developerConnection>
     </scm>
 
     <developers>
+        <developer>
+            <name>xiaochao Wang</name>
+            <email>44312782@qq.com</email>
+            <organization>http://sidao.org</organization>
+        </developer>
         <developer>
             <name>翟永超-程序猿DD</name>
             <email>dyc87112@qq.com</email>
@@ -49,7 +53,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>1.8</version.java>
         <version.swagger>2.8.0</version.swagger>
-        <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
+        <version.spring-boot>2.0.2.RELEASE</version.spring-boot>
         <version.lombok>1.16.18</version.lombok>
     </properties>
 
