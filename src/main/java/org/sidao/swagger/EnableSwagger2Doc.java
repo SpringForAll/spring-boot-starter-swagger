@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({SwaggerAutoConfiguration.class})
+@Import({SwaggerAutoConfiguration.class, SwaggerConfig.class})
 public @interface EnableSwagger2Doc {
 
 
