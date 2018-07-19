@@ -6,7 +6,7 @@
 
     <groupId>org.sidao</groupId>
     <artifactId>swagger2-spring-boot-starter</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.0.RELEASE</version>
     <packaging>jar</packaging>
 
     <name>swagger2-spring-boot-starter</name>
@@ -28,9 +28,9 @@
     </licenses>
 
     <scm>
+        <url>git@github.com:wxcmyx/swagger2-spring-boot-starter.gi</url>
         <connection>git@github.com:wxcmyx/swagger2-spring-boot-starter.git</connection>
         <developerConnection>https://github.com/wxcmyx/swagger2-spring-boot-starter</developerConnection>
-        <url>git@github.com:wxcmyx/swagger2-spring-boot-starter.git</url>
     </scm>
 
     <developers>
