@@ -28,8 +28,8 @@
     </licenses>
 
     <scm>
-        <url>git@github.com:wxcmyx/swagger2-spring-boot-starter.gi</url>
-        <connection>git@github.com:wxcmyx/swagger2-spring-boot-starter.git</connection>
+        <url>scm:git:https://github.com/wxcmyx/swagger2-spring-boot-starter.git</url>
+        <connection>scm:git:https://github.com/wxcmyx/swagger2-spring-boot-starter.git</connection>
         <developerConnection>https://github.com/wxcmyx/swagger2-spring-boot-starter</developerConnection>
     </scm>
 
