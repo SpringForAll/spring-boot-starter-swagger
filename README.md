@@ -13,8 +13,7 @@
 
 # 版本基础
 
-- Spring Boot：1.5.x
-- Swagger：2.9.x
+- Swagger：2.9.2
 
 # 如何使用
 
@@ -22,13 +21,11 @@
 
 - 在`pom.xml`中引入依赖：
 
-> 当前最新版本 1.7.1.RELEASE
-
 ```xml
 <dependency>
 	<groupId>com.spring4all</groupId>
 	<artifactId>swagger-spring-boot-starter</artifactId>
-	<version>1.7.1.RELEASE</version>
+	<version>1.8.0.RELEASE</version>
 </dependency>
 ```
 
