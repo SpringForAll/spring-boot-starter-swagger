@@ -6,7 +6,7 @@
 
     <groupId>com.spring4all</groupId>
     <artifactId>swagger-spring-boot-starter</artifactId>
-    <version>1.7.1.RELEASE</version>
+    <version>1.8.0.RELEASE</version>
 
     <name>spring-boot-starter-swagger</name>
     <url>https://github.com/SpringForAll/spring-boot-starter-swagger</url>
@@ -48,7 +48,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java>1.8</version.java>
-        <version.swagger>2.9.0</version.swagger>
+        <version.swagger>2.9.2</version.swagger>
         <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
         <version.lombok>1.16.18</version.lombok>
     </properties>
@@ -62,6 +62,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -84,11 +89,6 @@
             <artifactId>lombok</artifactId>
             <version>${version.lombok}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 
