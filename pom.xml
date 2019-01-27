@@ -50,7 +50,7 @@
         <version.java>1.8</version.java>
         <version.swagger>2.9.2</version.swagger>
         <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
-        <version.lombok>1.16.18</version.lombok>
+        <version.lombok>1.18.0</version.lombok>
     </properties>
 
     <dependencies>
