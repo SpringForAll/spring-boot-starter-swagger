@@ -107,10 +107,15 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .securitySchemes(Collections.singletonList(apiKey()))
                     .securityContexts(Collections.singletonList(securityContext()))
                     .globalOperationParameters(buildGlobalOperationParametersFromSwaggerProperties(
                             swaggerProperties.getGlobalOperationParameters()));
+
+            if ("BasicAuth".equalsIgnoreCase(swaggerProperties.getAuthorization().getType())) {
+                docketForBuilder.securitySchemes(Collections.singletonList(basicAuth()));
+            } else if (!"None".equalsIgnoreCase(swaggerProperties.getAuthorization().getType())) {
+                docketForBuilder.securitySchemes(Collections.singletonList(apiKey()));
+            }
 
             // 全局响应消息
             if (!swaggerProperties.getApplyDefaultResponseMessages()) {
@@ -175,10 +180,15 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
             Docket docketForBuilder = new Docket(DocumentationType.SWAGGER_2)
                     .host(swaggerProperties.getHost())
                     .apiInfo(apiInfo)
-                    .securitySchemes(Collections.singletonList(apiKey()))
                     .securityContexts(Collections.singletonList(securityContext()))
                     .globalOperationParameters(assemblyGlobalOperationParameters(swaggerProperties.getGlobalOperationParameters(),
                             docketInfo.getGlobalOperationParameters()));
+
+            if ("BasicAuth".equalsIgnoreCase(swaggerProperties.getAuthorization().getType())) {
+                docketForBuilder.securitySchemes(Collections.singletonList(basicAuth()));
+            } else if (!"None".equalsIgnoreCase(swaggerProperties.getAuthorization().getType())) {
+                docketForBuilder.securitySchemes(Collections.singletonList(apiKey()));
+            }
 
             // 全局响应消息
             if (!swaggerProperties.getApplyDefaultResponseMessages()) {
@@ -216,6 +226,15 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
         return new ApiKey(swaggerProperties().getAuthorization().getName(),
                 swaggerProperties().getAuthorization().getKeyName(),
                 ApiKeyVehicle.HEADER.getValue());
+    }
+
+    /**
+     * 配置基于 BasicAuth 的鉴权对象
+     *
+     * @return
+     */
+    private BasicAuth basicAuth() {
+        return new BasicAuth(swaggerProperties().getAuthorization().getName());
     }
 
     /**

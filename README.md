@@ -283,6 +283,9 @@ swagger.docket.aaa.ignored-parameter-types[1]=com.didispace.demo.Product
 # 鉴权策略ID，对应 SecurityReferences ID
 swagger.authorization.name=Authorization
 
+# 鉴权策略，可选 ApiKey | BasicAuth | None，默认ApiKey
+swagger.authorization.type=ApiKey
+
 # 鉴权传递的Header参数
 swagger.authorization.key-name=token
 
@@ -290,7 +293,7 @@ swagger.authorization.key-name=token
 swagger.authorization.auth-regex=^.*$
 ```
 
-备注：目前支持`ApiKey`鉴权模式，后续添加`Oauth2`和`BasicAuth`支持
+备注：目前支持`ApiKey` | `BasicAuth`鉴权模式，`None`除消鉴权模式，默认ApiKey，后续添加`Oauth2`支持
 
 **使用须知**
 
