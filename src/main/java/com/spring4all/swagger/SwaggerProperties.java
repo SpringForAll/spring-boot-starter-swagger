@@ -345,6 +345,11 @@ public class SwaggerProperties {
         private String name = "Authorization";
 
         /**
+         * 鉴权策略，可选 ApiKey | BasicAuth | None，默认ApiKey
+         */
+        private String type = "ApiKey";
+
+        /**
          * 鉴权传递的Header参数
          */
         private String keyName = "TOKEN";
