@@ -14,11 +14,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
+import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
+import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.ApiKeyVehicle;
 import springfox.documentation.swagger.web.UiConfiguration;
@@ -122,8 +124,14 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
             }
 
-            Docket docket = docketForBuilder.select()
-                    .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
+            // 同组支持多个包路径配置
+            ApiSelectorBuilder apiSelectorBuilder = docketForBuilder.select();
+            List<Predicate<RequestHandler>> selectors = new ArrayList<Predicate<RequestHandler>>();
+            for (String basePackage : swaggerProperties.getBasePackages()) {
+                selectors.add(RequestHandlerSelectors.basePackage(basePackage));
+            }
+            apiSelectorBuilder.apis(Predicates.or(selectors));
+            Docket docket = apiSelectorBuilder
                     .paths(
                             Predicates.and(
                                     Predicates.not(Predicates.or(excludePath)),
@@ -195,9 +203,15 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
             }
 
-            Docket docket = docketForBuilder.groupName(groupName)
-                    .select()
-                    .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
+            // 同组支持多个包路径配置
+            ApiSelectorBuilder apiSelectorBuilder = docketForBuilder.select();
+            List<Predicate<RequestHandler>> selectors = new ArrayList<Predicate<RequestHandler>>();
+            for (String basePackage : docketInfo.getBasePackages()) {
+                selectors.add(RequestHandlerSelectors.basePackage(basePackage));
+            }
+            apiSelectorBuilder.apis(Predicates.or(selectors));
+
+            Docket docket = apiSelectorBuilder
                     .paths(
                             Predicates.and(
                                     Predicates.not(Predicates.or(excludePath)),

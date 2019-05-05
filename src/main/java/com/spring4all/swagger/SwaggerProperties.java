@@ -62,7 +62,7 @@ public class SwaggerProperties {
     /**
      * swagger会解析的包路径
      **/
-    private String basePackage = "";
+    private List<String> basePackages = new ArrayList<>();
 
     /**
      * swagger会解析的url规则
@@ -172,7 +172,7 @@ public class SwaggerProperties {
         /**
          * swagger会解析的包路径
          **/
-        private String basePackage = "";
+        private List<String> basePackages = new ArrayList<>();
 
         /**
          * swagger会解析的url规则
