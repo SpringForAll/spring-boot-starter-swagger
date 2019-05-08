@@ -6,7 +6,7 @@
 
     <groupId>com.spring4all</groupId>
     <artifactId>swagger-spring-boot-starter</artifactId>
-    <version>1.9.2.RELEASE</version>
+    <version>1.9.1.RELEASE</version>
 
     <name>spring-boot-starter-swagger</name>
     <url>https://github.com/SpringForAll/spring-boot-starter-swagger</url>
@@ -133,17 +133,4 @@
             <url>https://jcenter.bintray.com/</url>
         </repository>
     </repositories>
-    <distributionManagement>
-        <!-- 两个ID必须与 setting.xml中的<server><id>nexus-rs</id></server>保持一致-->
-        <repository>
-            <id>nexus-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>http://192.168.1.2:8081/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>http://192.168.1.2:8081/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
