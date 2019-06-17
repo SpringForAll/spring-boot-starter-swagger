@@ -136,6 +136,16 @@ public class SwaggerProperties {
          **/
         private String required;
 
+        /**
+         * 参数用例
+         */
+        private String example;
+
+        /**
+         * 参数默认值
+         */
+        private String defaultValue;
+
     }
 
     @Data

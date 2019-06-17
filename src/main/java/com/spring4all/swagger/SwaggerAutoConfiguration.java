@@ -285,6 +285,8 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                     .modelRef(new ModelRef(globalOperationParameter.getModelRef()))
                     .parameterType(globalOperationParameter.getParameterType())
                     .required(Boolean.parseBoolean(globalOperationParameter.getRequired()))
+                    .scalarExample(globalOperationParameter.getExample())
+                    .defaultValue(globalOperationParameter.getDefaultValue())
                     .build());
         }
         return parameters;
