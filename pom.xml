@@ -89,7 +89,7 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-models</artifactId>
-            <version>version.swagger-models</version>
+            <version>${version.swagger-models}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
