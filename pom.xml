@@ -51,6 +51,7 @@
         <version.swagger>2.9.2</version.swagger>
         <version.spring-boot>1.5.10.RELEASE</version.spring-boot>
         <version.lombok>1.18.6</version.lombok>
+        <version.swagger-models>1.5.24</version.swagger-models>
     </properties>
 
     <dependencies>
@@ -78,6 +79,17 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>${version.swagger}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>swagger-models</artifactId>
+                    <groupId>io.swagger</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>${version.swagger-models}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
