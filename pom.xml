@@ -102,6 +102,12 @@
             <version>${version.lombok}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

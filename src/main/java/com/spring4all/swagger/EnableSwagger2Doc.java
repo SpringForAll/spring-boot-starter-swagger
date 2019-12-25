@@ -13,7 +13,10 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({SwaggerAutoConfiguration.class})
+@Import({
+        SwaggerAutoConfiguration.class,
+        GsonSerializerConfigration.class
+})
 public @interface EnableSwagger2Doc {
 
 
