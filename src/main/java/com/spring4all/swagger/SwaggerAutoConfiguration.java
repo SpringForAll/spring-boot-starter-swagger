@@ -1,7 +1,5 @@
 package com.spring4all.swagger;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -25,9 +23,8 @@ import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static com.google.common.collect.Lists.newArrayList;
 
 /**
  * @author 翟永超
@@ -122,6 +119,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
             }
 
+            // TODO Guava去掉了之后，需要换种写法
             Docket docket = docketForBuilder.select()
                     .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                     .paths(
@@ -195,6 +193,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 buildGlobalResponseMessage(swaggerProperties, docketForBuilder);
             }
 
+            // TODO Guava去掉了之后，需要换种写法
             Docket docket = docketForBuilder.groupName(groupName)
                     .select()
                     .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
@@ -270,9 +269,11 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
         this.beanFactory = beanFactory;
     }
 
-
+    // TODO 全局参数的配置功能：过期了，需要重写/
     private List<Parameter> buildGlobalOperationParametersFromSwaggerProperties(
             List<SwaggerProperties.GlobalOperationParameter> globalOperationParameters) {
+
+        // TODO Guava去掉了之后，需要换种写法
         List<Parameter> parameters = newArrayList();
 
         if (Objects.isNull(globalOperationParameters)) {
@@ -291,7 +292,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     }
 
     /**
-     * 局部参数按照name覆盖局部参数
+     * TODO 局部参数按照name覆盖局部参数（过期了，需要重写）
      *
      * @param globalOperationParameters
      * @param docketOperationParameters
@@ -309,6 +310,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
                 .map(SwaggerProperties.GlobalOperationParameter::getName)
                 .collect(Collectors.toSet());
 
+        // TODO Guava去掉了之后，需要换种写法
         List<SwaggerProperties.GlobalOperationParameter> resultOperationParameters = newArrayList();
 
         if (Objects.nonNull(globalOperationParameters)) {
@@ -334,6 +336,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
         SwaggerProperties.GlobalResponseMessage globalResponseMessages =
                 swaggerProperties.getGlobalResponseMessage();
 
+        // TODO ResponseMessage过期，需要重写
         /* POST,GET,PUT,PATCH,DELETE,HEAD,OPTIONS,TRACE 响应消息体 **/
         List<ResponseMessage> postResponseMessages = getResponseMessageList(globalResponseMessages.getPost());
         List<ResponseMessage> getResponseMessages = getResponseMessageList(globalResponseMessages.getGet());
