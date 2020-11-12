@@ -66,7 +66,7 @@ public class SwaggerAutoConfiguration implements BeanFactoryAware {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnBean(UiConfiguration.class)
-    @ConditionalOnProperty(name = "swagger.enabled", matchIfMissing = true)
+    @ConditionalOnProperty(name = "swagger.enabled", matchIfMissing = true， havingValue="true")
     public List<Docket> createRestApi(SwaggerProperties swaggerProperties) {
         ConfigurableBeanFactory configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
         List<Docket> docketList = new LinkedList<>();
