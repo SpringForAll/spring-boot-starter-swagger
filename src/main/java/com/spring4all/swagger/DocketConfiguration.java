@@ -43,6 +43,11 @@ public class DocketConfiguration {
             builder.securitySchemes(Collections.singletonList(swaggerAuthorizationConfiguration.apiKey()));
         }
 
+        // 要忽略的参数类型
+        Class<?>[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
+        Class<?>[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
+        builder.ignoredParameterTypes(ignoredParameterTypes);
+
         // 需要生成文档的接口目标配置
         Docket docket = builder.select()
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))  // 通过扫描包选择接口
