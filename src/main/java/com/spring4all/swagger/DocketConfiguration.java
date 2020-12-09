@@ -1,5 +1,6 @@
 package com.spring4all.swagger;
 
+import com.google.common.base.Predicates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -9,7 +10,10 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author 翟永超
@@ -51,30 +55,41 @@ public class DocketConfiguration {
         // 需要生成文档的接口目标配置
         Docket docket = builder.select()
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))  // 通过扫描包选择接口
-//                .paths(paths(swaggerProperties))  // TODO 通过路径匹配选择接口
+                .paths(paths(swaggerProperties))  // 通过路径匹配选择接口
                 .build();
 
         return docket;
     }
 
     /**
-     * TODO API接口路径选择
+     * API接口路径选择
      *
      * @param swaggerProperties
      * @return
      */
-//    private Predicate paths(SwaggerProperties swaggerProperties) {
-    // TODO 原来的方式不能用了
-//        return or(
-//                regex("/business.*"),
-//                regex("/some.*"),
-//                regex("/contacts.*"),
-//                regex("/pet.*"),
-//                regex("/springsRestController.*"),
-//                regex("/test.*")
-//        );
-//        return null;
-//    }
+
+    private Predicate paths(SwaggerProperties swaggerProperties) {
+        // base-path处理
+        // 当没有配置任何path的时候，解析/**
+        if (swaggerProperties.getBasePath().isEmpty()) {
+            swaggerProperties.getBasePath().add("/**");
+        }
+        List<com.google.common.base.Predicate<String>> basePath = new ArrayList();
+        for (String path : swaggerProperties.getBasePath()) {
+            basePath.add(PathSelectors.ant(path));
+        }
+
+        // exclude-path处理
+        List<com.google.common.base.Predicate<String>> excludePath = new ArrayList();
+        for (String path : swaggerProperties.getExcludePath()) {
+            excludePath.add(PathSelectors.ant(path));
+        }
+
+        return Predicates.and(
+                Predicates.not(Predicates.or(excludePath)),
+                Predicates.or(basePath)
+        );
+    }
 
     /**
      * API文档基本信息
