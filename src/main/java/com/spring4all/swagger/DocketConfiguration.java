@@ -1,12 +1,16 @@
 package com.spring4all.swagger;
 
 import com.google.common.base.Predicates;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.ScalarType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
+import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
@@ -14,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.singletonList;
 
 /**
  * @author 翟永超
@@ -54,11 +61,34 @@ public class DocketConfiguration {
 
         // 需要生成文档的接口目标配置
         Docket docket = builder.select()
-                .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))  // 通过扫描包选择接口
-                .paths(paths(swaggerProperties))  // 通过路径匹配选择接口
-                .build();
+                // 通过扫描包选择接口
+                .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
+                // 通过路径匹配选择接口
+                .paths(paths(swaggerProperties))
+                .build()
+                .globalRequestParameters(globalRequestParameters(swaggerProperties));
 
         return docket;
+    }
+
+
+    /**
+     * 全局请求参数
+     *
+     * @param swaggerProperties {@link SwaggerProperties}
+     * @return RequestParameter {@link RequestParameter}
+     */
+    private List<RequestParameter> globalRequestParameters(SwaggerProperties swaggerProperties) {
+        return swaggerProperties.getGlobalOperationParameters().stream().map(param -> {
+            return new RequestParameterBuilder()
+                    .name(param.getName())
+                    .description(param.getDescription())
+                    .in(param.getParameterType())
+                    .required(param.getRequired())
+                    .query(q -> q.defaultValue(param.getModelRef()))
+                    .query(q -> q.model(m -> m.scalarModel(ScalarType.STRING)))
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -74,13 +104,13 @@ public class DocketConfiguration {
         if (swaggerProperties.getBasePath().isEmpty()) {
             swaggerProperties.getBasePath().add("/**");
         }
-        List<com.google.common.base.Predicate<String>> basePath = new ArrayList();
+        List<com.google.common.base.Predicate<String>> basePath = new ArrayList<>();
         for (String path : swaggerProperties.getBasePath()) {
             basePath.add(PathSelectors.ant(path));
         }
 
         // exclude-path处理
-        List<com.google.common.base.Predicate<String>> excludePath = new ArrayList();
+        List<com.google.common.base.Predicate<String>> excludePath = new ArrayList<>();
         for (String path : swaggerProperties.getExcludePath()) {
             excludePath.add(PathSelectors.ant(path));
         }
