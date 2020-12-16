@@ -59,8 +59,8 @@ public class DocketConfiguration {
         Class<?>[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
         builder.ignoredParameterTypes(ignoredParameterTypes);
 
-        //
-        if(swaggerProperties.getGlobalOperationParameters() != null) {
+        // 设置全局参数
+        if (swaggerProperties.getGlobalOperationParameters() != null) {
             builder.globalRequestParameters(globalRequestParameters(swaggerProperties));
         }
 
@@ -75,7 +75,6 @@ public class DocketConfiguration {
         return docket;
     }
 
-
     /**
      * 全局请求参数
      *
@@ -83,16 +82,14 @@ public class DocketConfiguration {
      * @return RequestParameter {@link RequestParameter}
      */
     private List<RequestParameter> globalRequestParameters(SwaggerProperties swaggerProperties) {
-        return swaggerProperties.getGlobalOperationParameters().stream().map(param -> {
-            return new RequestParameterBuilder()
-                    .name(param.getName())
-                    .description(param.getDescription())
-                    .in(param.getParameterType())
-                    .required(param.getRequired())
-                    .query(q -> q.defaultValue(param.getModelRef()))
-                    .query(q -> q.model(m -> m.scalarModel(ScalarType.STRING)))
-                    .build();
-        }).collect(Collectors.toList());
+        return swaggerProperties.getGlobalOperationParameters().stream().map(param -> new RequestParameterBuilder()
+                .name(param.getName())
+                .description(param.getDescription())
+                .in(param.getParameterType())
+                .required(param.getRequired())
+                .query(q -> q.defaultValue(param.getModelRef()))
+                .query(q -> q.model(m -> m.scalarModel(ScalarType.STRING)))
+                .build()).collect(Collectors.toList());
     }
 
     /**
