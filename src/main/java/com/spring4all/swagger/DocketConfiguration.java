@@ -59,14 +59,18 @@ public class DocketConfiguration {
         Class<?>[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
         builder.ignoredParameterTypes(ignoredParameterTypes);
 
+        //
+        if(swaggerProperties.getGlobalOperationParameters() != null) {
+            builder.globalRequestParameters(globalRequestParameters(swaggerProperties));
+        }
+
         // 需要生成文档的接口目标配置
         Docket docket = builder.select()
                 // 通过扫描包选择接口
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                 // 通过路径匹配选择接口
                 .paths(paths(swaggerProperties))
-                .build()
-                .globalRequestParameters(globalRequestParameters(swaggerProperties));
+                .build();
 
         return docket;
     }
