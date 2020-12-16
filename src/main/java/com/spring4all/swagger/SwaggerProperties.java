@@ -101,14 +101,14 @@ public class SwaggerProperties {
         private String modelRef;
 
         /**
-         * 参数放在哪个地方:header,query,path,body.form
+         * 参数放在哪个地方:header,query,path,formData,cookie,form
          **/
         private String parameterType;
 
         /**
          * 参数是否必须传
          **/
-        private String required;
+        private Boolean required;
 
     }
 
