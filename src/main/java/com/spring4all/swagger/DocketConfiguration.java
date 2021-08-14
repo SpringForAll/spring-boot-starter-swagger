@@ -1,9 +1,24 @@
 package com.spring4all.swagger;
 
-import com.google.common.base.Predicates;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.google.common.base.Predicates;
+
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
@@ -14,134 +29,165 @@ import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static java.util.Collections.singletonList;
-
 /**
  * @author 翟永超
- * Create date：2017/8/7.
- * My blog： http://blog.didispace.com
+ * @Create date：2017/8/7.
+ * @Update date：2021/8/13
+ * @My blog： http://blog.didispace.com
  */
 @Configuration
-public class DocketConfiguration {
+@EnableConfigurationProperties(SwaggerProperties.class)
+public class DocketConfiguration implements BeanFactoryAware {
 
+    private BeanFactory beanFactory;
+
+    @Autowired
     private SwaggerProperties swaggerProperties;
-    private SwaggerAuthorizationConfiguration swaggerAuthorizationConfiguration;
 
-    public DocketConfiguration(SwaggerProperties swaggerProperties,
-                               SwaggerAuthorizationConfiguration swaggerAuthorizationConfiguration) {
-        this.swaggerProperties = swaggerProperties;
-        this.swaggerAuthorizationConfiguration = swaggerAuthorizationConfiguration;
+    private static final String BEAN_NAME = "spring-boot-starter-swagger-";
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
     }
 
+    /**
+     * Create the corresponding configuration for DocumentationPluginRegistry
+     */
     @Bean
-    public Docket createRestApi() {
-        // 文档的基础信息配置
-        Docket builder = new Docket(DocumentationType.SWAGGER_2)
-                .host(swaggerProperties.getHost())
-                .apiInfo(apiInfo(swaggerProperties));
+    public void createSpringFoxRestApi() {
+        BeanDefinitionRegistry beanRegistry = (BeanDefinitionRegistry)beanFactory;
 
-        // 安全相关的配置
-        builder.securityContexts(Collections.singletonList(swaggerAuthorizationConfiguration.securityContext()));
-        if ("BasicAuth".equalsIgnoreCase(swaggerAuthorizationConfiguration.getType())) {
-            builder.securitySchemes(Collections.singletonList(swaggerAuthorizationConfiguration.basicAuth()));
-        } else if (!"None".equalsIgnoreCase(swaggerAuthorizationConfiguration.getType())) {
-            builder.securitySchemes(Collections.singletonList(swaggerAuthorizationConfiguration.apiKey()));
-        }
+        // 没有分组
+        if (swaggerProperties.getDocket().size() == 0) {
+            String beanName = BEAN_NAME + "default";
+            BeanDefinition beanDefinition4Group = new GenericBeanDefinition();
+            beanDefinition4Group.getConstructorArgumentValues().addIndexedArgumentValue(0, DocumentationType.OAS_30);
+            beanDefinition4Group.setBeanClassName(Docket.class.getName());
+            beanDefinition4Group.setRole(BeanDefinition.ROLE_SUPPORT);
+            beanRegistry.registerBeanDefinition(beanName, beanDefinition4Group);
 
-        // 要忽略的参数类型
-        Class<?>[] array = new Class[swaggerProperties.getIgnoredParameterTypes().size()];
-        Class<?>[] ignoredParameterTypes = swaggerProperties.getIgnoredParameterTypes().toArray(array);
-        builder.ignoredParameterTypes(ignoredParameterTypes);
-
-        // 设置全局参数
-        if (swaggerProperties.getGlobalOperationParameters() != null) {
-            builder.globalRequestParameters(globalRequestParameters(swaggerProperties));
-        }
-
-        // 需要生成文档的接口目标配置
-        Docket docket = builder.select()
-                // 通过扫描包选择接口
+            Docket docket4Group = (Docket)beanFactory.getBean(beanName);
+            ApiInfo apiInfo = apiInfo(swaggerProperties);
+            docket4Group.host(swaggerProperties.getHost()).apiInfo(apiInfo).select()
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
-                // 通过路径匹配选择接口
-                .paths(paths(swaggerProperties))
+                .paths(paths(swaggerProperties.getBasePath(), swaggerProperties.getExcludePath())).build();
+            return;
+        }
+
+        for (Map.Entry<String, SwaggerProperties.DocketInfo> entry : swaggerProperties.getDocket().entrySet()) {
+            String groupName = entry.getKey();
+            SwaggerProperties.DocketInfo docketInfo = entry.getValue();
+            String beanName = BEAN_NAME + groupName;
+
+            ApiInfo apiInfo = new ApiInfoBuilder()
+                .title(docketInfo.getTitle().isEmpty() ? swaggerProperties.getTitle() : docketInfo.getTitle())
+                .description(docketInfo.getDescription().isEmpty() ? swaggerProperties.getDescription()
+                    : docketInfo.getDescription())
+                .version(docketInfo.getVersion().isEmpty() ? swaggerProperties.getVersion() : docketInfo.getVersion())
+                .license(docketInfo.getLicense().isEmpty() ? swaggerProperties.getLicense() : docketInfo.getLicense())
+                .licenseUrl(docketInfo.getLicenseUrl().isEmpty() ? swaggerProperties.getLicenseUrl()
+                    : docketInfo.getLicenseUrl())
+                .contact(new Contact(
+                    docketInfo.getContact().getName().isEmpty() ? swaggerProperties.getContact().getName()
+                        : docketInfo.getContact().getName(),
+                    docketInfo.getContact().getUrl().isEmpty() ? swaggerProperties.getContact().getUrl()
+                        : docketInfo.getContact().getUrl(),
+                    docketInfo.getContact().getEmail().isEmpty() ? swaggerProperties.getContact().getEmail()
+                        : docketInfo.getContact().getEmail()))
+                .termsOfServiceUrl(docketInfo.getTermsOfServiceUrl().isEmpty()
+                    ? swaggerProperties.getTermsOfServiceUrl() : docketInfo.getTermsOfServiceUrl())
                 .build();
 
-        return docket;
+            // base-path处理
+            // 当没有配置任何path的时候，解析/**
+            if (docketInfo.getBasePath().isEmpty()) {
+                docketInfo.getBasePath().add("/**");
+            }
+
+            List<Predicate<String>> basePath = new ArrayList<>();
+            for (String path : docketInfo.getBasePath()) {
+                basePath.add(PathSelectors.ant(path));
+            }
+
+            // exclude-path处理
+            List<Predicate<String>> excludePath = new ArrayList<>();
+            for (String path : docketInfo.getExcludePath()) {
+                excludePath.add(PathSelectors.ant(path));
+            }
+
+            BeanDefinition beanDefinition4Group = new GenericBeanDefinition();
+            beanDefinition4Group.getConstructorArgumentValues().addIndexedArgumentValue(0, DocumentationType.OAS_30);
+            beanDefinition4Group.setBeanClassName(Docket.class.getName());
+            beanDefinition4Group.setRole(BeanDefinition.ROLE_SUPPORT);
+            beanRegistry.registerBeanDefinition(beanName, beanDefinition4Group);
+
+            Docket docket4Group = (Docket)beanFactory.getBean(beanName);
+            docket4Group.groupName(groupName).host(docketInfo.getBasePackage()).apiInfo(apiInfo).select()
+                .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
+                .paths(paths(docketInfo.getBasePath(), docketInfo.getExcludePath())).build();
+        }
     }
 
     /**
      * 全局请求参数
      *
-     * @param swaggerProperties {@link SwaggerProperties}
+     * @param swaggerProperties
+     *            {@link SwaggerProperties}
      * @return RequestParameter {@link RequestParameter}
      */
     private List<RequestParameter> globalRequestParameters(SwaggerProperties swaggerProperties) {
-        return swaggerProperties.getGlobalOperationParameters().stream().map(param -> new RequestParameterBuilder()
-                .name(param.getName())
-                .description(param.getDescription())
-                .in(param.getParameterType())
-                .required(param.getRequired())
+        return swaggerProperties.getGlobalOperationParameters().stream()
+            .map(param -> new RequestParameterBuilder().name(param.getName()).description(param.getDescription())
+                .in(param.getParameterType()).required(param.getRequired())
                 .query(q -> q.defaultValue(param.getModelRef()))
-                .query(q -> q.model(m -> m.scalarModel(ScalarType.STRING)))
-                .build()).collect(Collectors.toList());
+                .query(q -> q.model(m -> m.scalarModel(ScalarType.STRING))).build())
+            .collect(Collectors.toList());
     }
 
     /**
      * API接口路径选择
      *
-     * @param swaggerProperties
-     * @return
+     * @param basePath
+     *            basePath
+     * @param excludePath
+     *            excludePath
+     * @return path
      */
 
-    private Predicate paths(SwaggerProperties swaggerProperties) {
+    private Predicate paths(List<String> basePath, List<String> excludePath) {
         // base-path处理
         // 当没有配置任何path的时候，解析/**
-        if (swaggerProperties.getBasePath().isEmpty()) {
-            swaggerProperties.getBasePath().add("/**");
+        if (basePath.isEmpty()) {
+            basePath.add("/**");
         }
-        List<com.google.common.base.Predicate<String>> basePath = new ArrayList<>();
-        for (String path : swaggerProperties.getBasePath()) {
-            basePath.add(PathSelectors.ant(path));
+        List<com.google.common.base.Predicate<String>> basePathList = new ArrayList<>();
+        for (String path : basePath) {
+            basePathList.add(PathSelectors.ant(path));
         }
 
         // exclude-path处理
-        List<com.google.common.base.Predicate<String>> excludePath = new ArrayList<>();
-        for (String path : swaggerProperties.getExcludePath()) {
-            excludePath.add(PathSelectors.ant(path));
+        List<com.google.common.base.Predicate<String>> excludePathList = new ArrayList<>();
+        for (String path : excludePath) {
+            excludePathList.add(PathSelectors.ant(path));
         }
 
-        return Predicates.and(
-                Predicates.not(Predicates.or(excludePath)),
-                Predicates.or(basePath)
-        );
+        return Predicates.and(Predicates.not(Predicates.or(excludePathList)), Predicates.or(basePathList));
     }
 
     /**
      * API文档基本信息
      *
      * @param swaggerProperties
-     * @return
+     *            swaggerProperties
+     * @return apiInfo
      */
     private ApiInfo apiInfo(SwaggerProperties swaggerProperties) {
-        ApiInfo apiInfo = new ApiInfoBuilder()
-                .title(swaggerProperties.getTitle())
-                .description(swaggerProperties.getDescription())
-                .version(swaggerProperties.getVersion())
-                .license(swaggerProperties.getLicense())
-                .licenseUrl(swaggerProperties.getLicenseUrl())
-                .contact(new Contact(swaggerProperties.getContact().getName(),
-                        swaggerProperties.getContact().getUrl(),
-                        swaggerProperties.getContact().getEmail()))
-                .termsOfServiceUrl(swaggerProperties.getTermsOfServiceUrl())
-                .build();
-        return apiInfo;
+        return new ApiInfoBuilder().title(swaggerProperties.getTitle()).description(swaggerProperties.getDescription())
+            .version(swaggerProperties.getVersion()).license(swaggerProperties.getLicense())
+            .licenseUrl(swaggerProperties.getLicenseUrl())
+            .contact(new Contact(swaggerProperties.getContact().getName(), swaggerProperties.getContact().getUrl(),
+                swaggerProperties.getContact().getEmail()))
+            .termsOfServiceUrl(swaggerProperties.getTermsOfServiceUrl()).build();
     }
-
-
 }
