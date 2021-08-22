@@ -13,7 +13,7 @@
 
 # 版本基础
 
-- Swagger：2.9.2
+- Swagger：3.0.2
 
 # 如何使用
 
@@ -25,25 +25,14 @@
 <dependency>
 	<groupId>com.spring4all</groupId>
 	<artifactId>swagger-spring-boot-starter</artifactId>
-	<version>1.9.1.RELEASE</version>
+	<version>2.0.0.RELEASE</version>
 </dependency>
 ```
 
-**注意：从`1.6.0`开始，我们按Spring Boot官方建议修改了artifactId为`swagger-spring-boot-starter`，1.6.0之前的版本不做修改，依然为使用`spring-boot-starter-swagger` !**
+**注意
 
-- 在应用主类中增加`@EnableSwagger2Doc`注解
-
-```java
-@EnableSwagger2Doc
-@SpringBootApplication
-public class Bootstrap {
-
-    public static void main(String[] args) {
-        SpringApplication.run(Bootstrap.class, args);
-    }
-
-}
-```
+1. 从`1.6.0`开始，我们按Spring Boot官方建议修改了artifactId为`swagger-spring-boot-starter`，1.6.0之前的版本不做修改，依然为使用`spring-boot-starter-swagger` !**
+2. 从`2.0.0`开始，不再需要手工添加`@EnableSwagger2Doc`来启动Swagger配置
 
 默认情况下就能产生所有当前Spring MVC加载的请求映射文档。
 
@@ -54,7 +43,7 @@ public class Bootstrap {
 ## 配置示例
 
 ```properties
-swagger.enabled=true
+springfox.documentation.enabled=true
 
 swagger.title=spring-boot-starter-swagger
 swagger.description=Starter for swagger 2.x
@@ -97,7 +86,7 @@ swagger.global-response-message.post[0].modelRef=ERROR
 ### 默认配置
 
 ```properties
-- swagger.enabled=是否启用swagger，默认：true
+- springfox.documentation.enabled=是否启用swagger，默认：true
 - swagger.title=标题
 - swagger.description=描述
 - swagger.version=版本
@@ -118,12 +107,15 @@ swagger.global-response-message.post[0].modelRef=ERROR
 - swagger.globalOperationParameters[0].required=指定参数是否必传，true,false
 ```
 
-
 > `1.3.0.RELEASE`新增：`swagger.host`属性，同时也支持指定docket的配置
 >
 > `1.4.0.RELEASE`新增：
 > - `swagger.enabled`：用于开关swagger的配置
 > - `swagger.globalOperationParameters`：用于设置全局的参数，比如：header部分的accessToken等。该参数支持指定docket的配置。
+>
+> `2.0.0.RELEASE`调整：
+> - 原来的`swagger.enabled`配置修改为`springfox.documentation.enabled`来控制
+
 
 ### Path规则说明
 
@@ -349,10 +341,3 @@ private List<SecurityReference> defaultAuth() {
             .scopes(authorizationScopes).build());
 }
 ```
-
-## 贡献者
-
-- [程序猿DD-翟永超](https://github.com/dyc87112/)
-- [小火](https://renlulu.github.io/)
-- [泥瓦匠BYSocket](https://github.com/JeffLi1993)
-- [LarryKoo-古拉里](https://github.com/gumutianqi)
