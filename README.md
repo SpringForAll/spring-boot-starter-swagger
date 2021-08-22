@@ -13,7 +13,7 @@
 
 # 版本基础
 
-- Swagger：3.0.2
+- SpringFox Swagger：3.0.0
 
 # 如何使用
 
