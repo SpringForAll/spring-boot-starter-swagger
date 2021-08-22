@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * Used to change the initialization order of the starter
+ * Created on 2021/8/13
  *
  * @author llin6025
- * @Create 2021/8/13
  * @since 2.0.0
  */
 @ConditionalOnProperty(value = "springfox.documentation.enabled", havingValue = "true", matchIfMissing = true)

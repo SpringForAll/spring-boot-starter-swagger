@@ -30,10 +30,11 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 /**
- * @author 翟永超
- * @Create date：2017/8/7.
- * @Update date：2021/8/13
- * @My blog： http://blog.didispace.com
+ * @author 程序猿DD
+ * @author andi.lin
+ *
+ * Created on 2017/8/7
+ * Update on 2021/8/13
  */
 @Configuration
 @EnableConfigurationProperties(SwaggerProperties.class)
