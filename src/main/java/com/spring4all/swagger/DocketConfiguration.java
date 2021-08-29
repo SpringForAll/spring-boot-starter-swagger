@@ -1,5 +1,7 @@
 package com.spring4all.swagger;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.google.common.base.Predicates;
 
+import springfox.documentation.RequestHandler;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
@@ -70,8 +73,9 @@ public class DocketConfiguration implements BeanFactoryAware {
 
             Docket docket4Group = (Docket)beanFactory.getBean(beanName);
             ApiInfo apiInfo = apiInfo(swaggerProperties);
+
             docket4Group.host(swaggerProperties.getHost()).apiInfo(apiInfo).select()
-                .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
+                .apis(apis(swaggerProperties.getBasePackages()))
                 .paths(paths(swaggerProperties.getBasePath(), swaggerProperties.getExcludePath())).build();
             return;
         }
@@ -124,10 +128,36 @@ public class DocketConfiguration implements BeanFactoryAware {
             beanRegistry.registerBeanDefinition(beanName, beanDefinition4Group);
 
             Docket docket4Group = (Docket)beanFactory.getBean(beanName);
-            docket4Group.groupName(groupName).host(docketInfo.getBasePackage()).apiInfo(apiInfo).select()
-                .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
+            docket4Group.groupName(groupName).host(host()).apiInfo(apiInfo).select()
+                .apis(apis(docketInfo.getBasePackages()))
                 .paths(paths(docketInfo.getBasePath(), docketInfo.getExcludePath())).build();
         }
+    }
+
+    private String host() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            return "127.0.0.1";
+        }
+    }
+
+    /**
+     * 同组多包配置
+     * @param basePackages
+     * @return
+     */
+    private Predicate apis(List<String> basePackages) {
+        Predicate<RequestHandler> predicate = null;
+        for (String basePackage : basePackages) {
+            Predicate<RequestHandler> basePackagePredicate = RequestHandlerSelectors.basePackage(basePackage);
+            if (predicate == null) {
+                predicate = basePackagePredicate;
+            } else {
+                predicate.or(basePackagePredicate);
+            }
+        }
+        return predicate;
     }
 
     /**
