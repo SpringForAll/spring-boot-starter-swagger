@@ -34,12 +34,7 @@ public class PathSelectors {
    * @return predicate that matches a particular regex
    */
   public static Predicate<String> regex(final String pathRegex) {
-    return new Predicate<String>() {
-      @Override
-      public boolean apply(String input) {
-        return input.matches(pathRegex);
-      }
-    };
+    return input -> input.matches(pathRegex);
   }
 
   /**
@@ -49,12 +44,9 @@ public class PathSelectors {
    * @return predicate that matches a particular ant pattern
    */
   public static Predicate<String> ant(final String antPattern) {
-    return new Predicate<String>() {
-      @Override
-      public boolean apply(String input) {
-        AntPathMatcher matcher = new AntPathMatcher();
-        return matcher.match(antPattern, input);
-      }
+    return input -> {
+      AntPathMatcher matcher = new AntPathMatcher();
+      return matcher.match(antPattern, input);
     };
   }
 }
