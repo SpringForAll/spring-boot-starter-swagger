@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Configuration;
 
 import com.google.common.base.Predicates;
 
-import org.springframework.context.annotation.DependsOn;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
@@ -46,6 +45,9 @@ public class DocketConfiguration implements BeanFactoryAware {
 
     @Autowired
     private SwaggerProperties swaggerProperties;
+
+    @Autowired
+    private SwaggerAuthorizationConfiguration authConfiguration;
 
     private static final String BEAN_NAME = "spring-boot-starter-swagger-";
 
@@ -75,7 +77,9 @@ public class DocketConfiguration implements BeanFactoryAware {
             docket4Group.host(swaggerProperties.getHost()).apiInfo(apiInfo)
                 .globalRequestParameters(
                     assemblyRequestParameters(swaggerProperties.getGlobalOperationParameters(), new ArrayList<>()))
-                .select().apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
+                .securityContexts(Collections.singletonList(authConfiguration.securityContext()))
+                .securitySchemes(authConfiguration.getSecuritySchemes()).select()
+                .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                 .paths(paths(swaggerProperties.getBasePath(), swaggerProperties.getExcludePath())).build();
             return;
         }
@@ -131,7 +135,9 @@ public class DocketConfiguration implements BeanFactoryAware {
             docket4Group.groupName(groupName).host(docketInfo.getBasePackage()).apiInfo(apiInfo)
                 .globalRequestParameters(assemblyRequestParameters(swaggerProperties.getGlobalOperationParameters(),
                     docketInfo.getGlobalOperationParameters()))
-                .select().apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
+                .securityContexts(Collections.singletonList(authConfiguration.securityContext()))
+                .securitySchemes(authConfiguration.getSecuritySchemes()).select()
+                .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
                 .paths(paths(docketInfo.getBasePath(), docketInfo.getExcludePath())).build();
         }
     }
@@ -157,9 +163,9 @@ public class DocketConfiguration implements BeanFactoryAware {
     /**
      * 局部参数按照name覆盖局部参数
      *
-     * @param globalRequestParameters
-     * @param groupRequestParameters
-     * @return
+     * @param globalRequestParameters 全局配置
+     * @param groupRequestParameters Group 的配置
+     * @return 汇总配置
      */
     private List<RequestParameter> assemblyRequestParameters(
         List<SwaggerProperties.GlobalOperationParameter> globalRequestParameters,
