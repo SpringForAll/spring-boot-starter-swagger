@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
@@ -106,7 +107,13 @@ public class SwaggerProperties {
         /**
          * 指定参数类型
          **/
-        private String modelRef;
+        @Value("modelRef")
+        private String type;
+
+        /**
+         * 指定参数类型
+         **/
+        private String format = "";
 
         /**
          * 参数放在哪个地方:header,query,path,formData,cookie,form
@@ -116,7 +123,7 @@ public class SwaggerProperties {
         /**
          * 参数是否必须传
          **/
-        private Boolean required;
+        private Boolean required = false;
 
     }
 

@@ -1,8 +1,8 @@
 package com.spring4all.swagger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -25,6 +25,7 @@ import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.schema.ScalarType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
+import springfox.documentation.service.ParameterType;
 import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -44,6 +45,9 @@ public class DocketConfiguration implements BeanFactoryAware {
 
     @Autowired
     private SwaggerProperties swaggerProperties;
+
+    @Autowired
+    private SwaggerAuthorizationConfiguration authConfiguration;
 
     private static final String BEAN_NAME = "spring-boot-starter-swagger-";
 
@@ -70,7 +74,11 @@ public class DocketConfiguration implements BeanFactoryAware {
 
             Docket docket4Group = (Docket)beanFactory.getBean(beanName);
             ApiInfo apiInfo = apiInfo(swaggerProperties);
-            docket4Group.host(swaggerProperties.getHost()).apiInfo(apiInfo).select()
+            docket4Group.host(swaggerProperties.getHost()).apiInfo(apiInfo)
+                .globalRequestParameters(
+                    assemblyRequestParameters(swaggerProperties.getGlobalOperationParameters(), new ArrayList<>()))
+                .securityContexts(Collections.singletonList(authConfiguration.securityContext()))
+                .securitySchemes(authConfiguration.getSecuritySchemes()).select()
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
                 .paths(paths(swaggerProperties.getBasePath(), swaggerProperties.getExcludePath())).build();
             return;
@@ -124,7 +132,11 @@ public class DocketConfiguration implements BeanFactoryAware {
             beanRegistry.registerBeanDefinition(beanName, beanDefinition4Group);
 
             Docket docket4Group = (Docket)beanFactory.getBean(beanName);
-            docket4Group.groupName(groupName).host(docketInfo.getBasePackage()).apiInfo(apiInfo).select()
+            docket4Group.groupName(groupName).host(docketInfo.getBasePackage()).apiInfo(apiInfo)
+                .globalRequestParameters(assemblyRequestParameters(swaggerProperties.getGlobalOperationParameters(),
+                    docketInfo.getGlobalOperationParameters()))
+                .securityContexts(Collections.singletonList(authConfiguration.securityContext()))
+                .securitySchemes(authConfiguration.getSecuritySchemes()).select()
                 .apis(RequestHandlerSelectors.basePackage(docketInfo.getBasePackage()))
                 .paths(paths(docketInfo.getBasePath(), docketInfo.getExcludePath())).build();
         }
@@ -133,17 +145,51 @@ public class DocketConfiguration implements BeanFactoryAware {
     /**
      * 全局请求参数
      *
-     * @param swaggerProperties
+     * @param properties
      *            {@link SwaggerProperties}
      * @return RequestParameter {@link RequestParameter}
      */
-    private List<RequestParameter> globalRequestParameters(SwaggerProperties swaggerProperties) {
-        return swaggerProperties.getGlobalOperationParameters().stream()
+    private List<RequestParameter> getRequestParameters(List<SwaggerProperties.GlobalOperationParameter> properties) {
+        return properties.stream()
             .map(param -> new RequestParameterBuilder().name(param.getName()).description(param.getDescription())
-                .in(param.getParameterType()).required(param.getRequired())
-                .query(q -> q.defaultValue(param.getModelRef()))
-                .query(q -> q.model(m -> m.scalarModel(ScalarType.STRING))).build())
+                .in(ParameterType.from(param.getParameterType())).required(param.getRequired())
+                .query(q -> q.defaultValue(param.getType()))
+                .query(q -> q.model(m -> m.scalarModel(!ScalarType.from(param.getType(), param.getFormat()).isPresent()
+                    ? ScalarType.STRING : ScalarType.from(param.getType(), param.getFormat()).get())))
+                .build())
             .collect(Collectors.toList());
+    }
+
+    /**
+     * 局部参数按照name覆盖局部参数
+     *
+     * @param globalRequestParameters 全局配置
+     * @param groupRequestParameters Group 的配置
+     * @return 汇总配置
+     */
+    private List<RequestParameter> assemblyRequestParameters(
+        List<SwaggerProperties.GlobalOperationParameter> globalRequestParameters,
+        List<SwaggerProperties.GlobalOperationParameter> groupRequestParameters) {
+
+        if (Objects.isNull(groupRequestParameters) || groupRequestParameters.isEmpty()) {
+            return getRequestParameters(globalRequestParameters);
+        }
+
+        Set<String> paramNames = groupRequestParameters.stream()
+            .map(SwaggerProperties.GlobalOperationParameter::getName).collect(Collectors.toSet());
+
+        List<SwaggerProperties.GlobalOperationParameter> requestParameters = newArrayList();
+
+        if (Objects.nonNull(globalRequestParameters)) {
+            for (SwaggerProperties.GlobalOperationParameter parameter : globalRequestParameters) {
+                if (!paramNames.contains(parameter.getName())) {
+                    requestParameters.add(parameter);
+                }
+            }
+        }
+
+        requestParameters.addAll(groupRequestParameters);
+        return getRequestParameters(requestParameters);
     }
 
     /**
