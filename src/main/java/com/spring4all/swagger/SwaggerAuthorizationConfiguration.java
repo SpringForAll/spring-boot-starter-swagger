@@ -49,7 +49,7 @@ public class SwaggerAuthorizationConfiguration {
     /**
      * Authorization 配置项
      *
-     * @return List<SecurityScheme>
+     * @return
      */
     public List<SecurityScheme> getSecuritySchemes() {
         if ("BasicAuth".equalsIgnoreCase(getType())) {
