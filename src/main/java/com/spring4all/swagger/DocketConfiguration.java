@@ -16,6 +16,7 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.base.Predicates;
 
@@ -34,8 +35,7 @@ import springfox.documentation.spring.web.plugins.Docket;
  * @author 程序猿DD
  * @author andi.lin
  *
- * Created on 2017/8/7
- * Update on 2021/8/13
+ *         Created on 2017/8/7 Update on 2021/8/13
  */
 @Configuration
 @EnableConfigurationProperties(SwaggerProperties.class)
@@ -150,6 +150,10 @@ public class DocketConfiguration implements BeanFactoryAware {
      * @return RequestParameter {@link RequestParameter}
      */
     private List<RequestParameter> getRequestParameters(List<SwaggerProperties.GlobalOperationParameter> properties) {
+        if (CollectionUtils.isEmpty(properties)) {
+            return new ArrayList<>();
+        }
+
         return properties.stream()
             .map(param -> new RequestParameterBuilder().name(param.getName()).description(param.getDescription())
                 .in(ParameterType.from(param.getParameterType())).required(param.getRequired())
@@ -163,8 +167,10 @@ public class DocketConfiguration implements BeanFactoryAware {
     /**
      * 局部参数按照name覆盖局部参数
      *
-     * @param globalRequestParameters 全局配置
-     * @param groupRequestParameters Group 的配置
+     * @param globalRequestParameters
+     *            全局配置
+     * @param groupRequestParameters
+     *            Group 的配置
      * @return 汇总配置
      */
     private List<RequestParameter> assemblyRequestParameters(
