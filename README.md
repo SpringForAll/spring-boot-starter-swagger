@@ -69,7 +69,7 @@ swagger.globalOperationParameters[1].modelRef=string
 swagger.globalOperationParameters[1].parameterType=body
 swagger.globalOperationParameters[1].required=false
 
-// 取消使用默认预定义的响应消息,并使用自定义响应消息
+# 取消使用默认预定义的响应消息,并使用自定义响应消息
 swagger.apply-default-response-messages=false
 swagger.global-response-message.get[0].code=401
 swagger.global-response-message.get[0].message=401get
@@ -79,6 +79,9 @@ swagger.global-response-message.get[1].modelRef=ERROR
 swagger.global-response-message.post[0].code=500
 swagger.global-response-message.post[0].message=500post
 swagger.global-response-message.post[0].modelRef=ERROR
+
+# Spring Boot 2.6及以上需要配置这个参数
+spring.mvc.pathmatch.matching-strategy=ant_path_matcher
 ```
 
 ## 配置说明
