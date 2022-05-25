@@ -1,5 +1,6 @@
 package com.spring4all.swagger;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Import;
  * Create date：2017/8/7.
  * My blog： http://blog.didispace.com
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(SwaggerProperties.class)
 @ConditionalOnProperty(value = "springfox.documentation.enabled", havingValue = "true", matchIfMissing = true)
 @Import({SwaggerUiConfiguration.class, SwaggerAuthorizationConfiguration.class, DocketConfiguration.class})
