@@ -8,6 +8,8 @@ import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 /**
+ * UI相关的配置
+ *
  * @author 翟永超
  * Create date：2017/8/7.
  * My blog： http://blog.didispace.com

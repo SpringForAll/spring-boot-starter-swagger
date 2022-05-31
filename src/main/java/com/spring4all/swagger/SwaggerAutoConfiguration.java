@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
+ * Swagger自动化配置
+ *
  * @author 翟永超
  * Create date：2017/8/7.
  * My blog： http://blog.didispace.com

@@ -8,6 +8,8 @@ import springfox.documentation.swagger.web.OperationsSorter;
 import springfox.documentation.swagger.web.TagsSorter;
 
 /**
+ * 权限相关的属性
+ *
  * @author 翟永超
  * Create date ：2017/8/7.
  * My blog： http://blog.didispace.com

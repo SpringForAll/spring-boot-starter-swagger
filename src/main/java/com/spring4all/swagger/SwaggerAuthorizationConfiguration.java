@@ -12,8 +12,8 @@ import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.swagger.web.ApiKeyVehicle;
 
 /**
+ * 权限相关的配置
  * securitySchemes 支持方式之一 ApiKey
- *
  * @author 翟永超
  * Create date：2020/2/2.
  * My blog： http://blog.didispace.com

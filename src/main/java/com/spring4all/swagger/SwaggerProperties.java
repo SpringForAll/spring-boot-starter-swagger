@@ -12,9 +12,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
+ * Swagger基础属性
+ *
  * @author 翟永超
  * Create date ：2017/8/7.
- * My blog： http://blog.didispace.com
+ * My blog： <a href="http://blog.didispace.com">...</a>
  */
 @Data
 @ConfigurationProperties("swagger")

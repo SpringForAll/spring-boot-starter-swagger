@@ -4,6 +4,9 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import org.springframework.util.AntPathMatcher;
 
+/**
+ * 路径选择器
+ */
 public class PathSelectors {
   private PathSelectors() {
     throw new UnsupportedOperationException();

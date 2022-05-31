@@ -32,6 +32,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
 /**
+ * Docket配置
+ *
  * @author 程序猿DD
  * @author andi.lin
  *

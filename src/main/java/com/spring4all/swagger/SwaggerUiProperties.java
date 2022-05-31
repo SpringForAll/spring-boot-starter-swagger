@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * UI相关的属性
+ *
  * @author 翟永超
  * Create date ：2017/8/7.
  * My blog： http://blog.didispace.com

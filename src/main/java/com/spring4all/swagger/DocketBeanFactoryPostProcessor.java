@@ -10,9 +10,9 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
+ * 更改Starter的启动顺序
  * Used to change the initialization order of the starter
  * Created on 2021/8/13
- *
  * @author llin6025
  * @since 2.0.0
  */
